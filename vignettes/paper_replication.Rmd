@@ -1,0 +1,19 @@
+---
+title: "paper_replication"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{paper_replication}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(rdtest)
+```
