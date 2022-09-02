@@ -50,9 +50,9 @@ rdtest <- function(Z,X,bool.BalanceOnly,int.J=3,real.cutoff=0,bool.maxTest=TRUE)
 
   if (bool.BalanceOnly)
   {
-    list.result <- returnResultsBalanceTest(df.data = df.data,int.dimZ=int.dimZ,int.J = int.J,bool.maxTest=bool.maxTest)
+    list.result <- return_result_balance(df.data = df.data,int.dimZ=int.dimZ,int.J = int.J,bool.maxTest=bool.maxTest)
   } else {
-    list.result <- returnResultsJointTest(df.data = df.data,int.dimZ = int.dimZ,int.J = int.J,bool.maxTest=bool.maxTest)
+    list.result <- return_results_joint(df.data = df.data,int.dimZ = int.dimZ,int.J = int.J,bool.maxTest=bool.maxTest)
   }
 
   return(list.result)

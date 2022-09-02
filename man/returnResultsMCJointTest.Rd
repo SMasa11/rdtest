@@ -5,53 +5,57 @@
 \title{MC joint test of coverage / power check using simulated data}
 \usage{
 returnResultsMCJointTest(
-  int.ns = 300,
-  x.jump,
+  int_ns = 300,
+  x_jump,
   jump,
-  a.2,
+  a_2,
   dim,
   n,
-  cov.z,
-  frac.jump = "Half",
-  bool.mutePrint = FALSE,
-  int.J = 3,
-  bool.maxTest = FALSE,
-  bool.maxTestVinv = FALSE,
-  bool.knownV = FALSE,
-  fun.adjustBand = NULL,
-  bool.chisqStd = FALSE
+  cov_z,
+  frac_jump = "Half",
+  bool_mutePrint = FALSE,
+  int_J = 3,
+  bool_maxTest = FALSE,
+  bool_maxTestVinv = FALSE,
+  bool_knownV = FALSE,
+  fun_adjustBand = NULL,
+  bool_chisqStd = FALSE
 )
 }
 \arguments{
-\item{int.ns}{number of simulations to run}
+\item{int_ns}{Interger, number of simulations to run
+default is 300.}
 
-\item{x.jump}{x jump size}
+\item{x_jump}{Real, x jump size.}
 
-\item{jump}{z jump size}
+\item{jump}{Real, z jump size.}
 
-\item{a.2}{gap in heteroskedasticity}
+\item{a_2}{Real, gap in heteroskedasticity.}
 
-\item{dim}{number of z variables}
+\item{dim}{Integer, number of z variables.}
 
-\item{n}{sample size}
+\item{n}{Integer, sample size.}
 
-\item{frac.jump}{Either None, Half, All, Last}
+\item{frac_jump}{String, either "None", "Half", "All", "Last".}
 
-\item{bool.mutePrint}{boolean option for muting outputs}
+\item{bool_mutePrint}{Boolean, option for muting outputs.
+default is FALSE}
 
-\item{int.J}{integer of nearest neighbor for the variance estimation <= 3}
+\item{int_J}{Integer, nearest neighbor for the variance estimation <= 3
+default is 3.}
 
-\item{bool.maxTest}{boolean option for using the max test instead of chisqaured test, default is false}
+\item{bool_maxTest}{Boolean, use max test instead of L2 test,
+default is false.}
 
-\item{bool.maxTestVinv}{boolean option for using inverse V for max test}
+\item{bool_maxTestVinv}{Boolean, option for using inverse V for max test.}
 
-\item{bool.knownV}{boolean option for setting V as known (instead of inverse V)}
+\item{bool_knownV}{Boolean, option for setting V as known.}
 
-\item{fun.adjustBand}{real-valued function which returns a fraction of reduced bandwidth}
+\item{bool_chisqStd}{Boolean, for using standardized t stat for L2 test.}
 
-\item{bool.chisqStd}{boolean option for using standardized t stat for L2 test}
+\item{cov}{Real, correlation of Z variables.}
 
-\item{cov}{correlation of Z variables}
+\item{fun.adjustBand}{Function, returns a fraction of reduced bandwidth.}
 }
 \description{
 Example code for simulation excercise

@@ -7,10 +7,12 @@
 #' @param int.J integer of nearest neighbor for the variance estimation <= 3
 #' @param bool.maxTest boolean option to use max test rather than chi-squared test
 #'
-#' @export
 ####
 
-returnResultsBalanceTest <- function(df.data,int.dimZ,int.J=3,bool.maxTest=FALSE)
+return_result_balance <- function(df_data,
+                                  int_dimZ,
+                                  int_J = 3,
+                                  bool_maxTest = FALSE)
 {
   if (int.dimZ < 2) {stop("For the balance test with a single covariate, use rdrobust package.")}
 
@@ -19,9 +21,9 @@ returnResultsBalanceTest <- function(df.data,int.dimZ,int.J=3,bool.maxTest=FALSE
   real.covZ1Z2 <- cor(df.data$vec.Z.1,df.data$vec.Z.2)
 
   if (bool.maxTest == FALSE) {
-    list.resultCovariatesPart <- computeStatChiSquared(df.data=df.data,int.dimZ=int.dimZ,bool.joint=FALSE,int.J=int.J)
+    list.resultCovariatesPart <- compute_stat_L2(df.data=df.data,int.dimZ=int.dimZ,bool.joint=FALSE,int.J=int.J)
   } else {
-    list.resultCovariatesPart <- computeStatMax(df.data=df.data,int.dimZ=int.dimZ,bool.joint=FALSE,int.J=int.J)
+    list.resultCovariatesPart <- compute_stat_max(df.data=df.data,int.dimZ=int.dimZ,bool.joint=FALSE,int.J=int.J)
   }
 
   if (bool.maxTest==FALSE) {

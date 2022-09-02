@@ -472,7 +472,7 @@
 
 ---
 
-       vec.corZReportSpec vec.dimVecReportSpec vec.xjumpReportSpec
+       vec_corZReportSpec vec_dimVecReportSpec vec_xjumpReportSpec
     1                 0.5                    3                0.15
     2                 0.5                    3                0.15
     3                 0.5                    3                0.15
@@ -518,7 +518,7 @@
     43                0.5                    3                0.15
     44                0.5                    3                0.15
     45                0.5                    3                0.15
-       vec.zjumpReportSpec vec.naiveReportResult vec.bonfeReportResult
+       vec_zjumpReportSpec vec_naiveReportResult vec_bonfeReportResult
     1                  0.0                 0.333                 0.000
     2                  0.5                 0.667                 0.333
     3                  1.0                 1.000                 0.667
@@ -564,7 +564,7 @@
     43                 1.0                 0.667                 0.333
     44                 1.5                 0.667                 0.333
     45                 2.0                 0.667                 0.667
-       vec.jointReportResult vec.maxTestSpec
+       vec_jointReportResult vec_maxTestSpec
     1                  0.000            TRUE
     2                  0.667            TRUE
     3                  0.667            TRUE
@@ -613,10 +613,10 @@
 
 ---
 
-    [1] vec.corZReportSpec        vec.dimVecReportSpec     
-    [3] vec.naiveReportResult     vec.bonfeReportResult    
-    [5] vec.jointReportResult     vec.maxTestSpec          
-    [7] vec.medianMaxTestCritical
+    [1] vec_corZReportSpec        vec_dimVecReportSpec     
+    [3] vec_naiveReportResult     vec_bonfeReportResult    
+    [5] vec_jointReportResult     vec_maxTestSpec          
+    [7] vec_medianMaxTestCritical
     <0 rows> (or 0-length row.names)
 
 ---

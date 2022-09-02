@@ -1,19 +1,19 @@
 ####
-#' return max statistics for covariates balance
+#' return L2 statistics for covariates balance
 #'
 #' @param df.data data.frame of data to evaluate
 #' @param int.dimZ  integer dimension of covariates
 #' @param bool.joint Boolean TRUE if joint test, FALSE if covariate balance test only
 #' @param int.J integer of nearest neighbor for the variance estimation <= 3
-#' @param bool.maxTestVinv boolean option for using inv V for max test
 #' @param bool.knownV boolean option for setting known V instead of estimated Vinv
 #' @param real.covZ real value of correlation in V, nullified if bool.knownV is FALSE or in default
 #' @param fun.adjustBand real-valued function which returns a fraction of reduced bandwidth
+#' @param bool.chisqStd boolean option for using standardized t stat for L2 test
 #'
 #' @export
 ####
 
-computeStatMax <- function(df.data,int.dimZ,bool.joint,int.J,bool.maxTestVinv,bool.knownV=FALSE,real.covZ=NULL,fun.adjustBand=NULL)
+compute_stat_L2 <- function(df.data,int.dimZ,bool.joint,int.J,bool.knownV=FALSE,real.covZ=NULL,fun.adjustBand=NULL,bool.chisqStd=FALSE)
 {
   # booleans which return TRUE if tests are rejected by covariates only
   bool.rejectNaiveNull <- FALSE
@@ -80,8 +80,8 @@ computeStatMax <- function(df.data,int.dimZ,bool.joint,int.J,bool.maxTestVinv,bo
   for (d in 1:int.dimZ)
   {
     # enforce the bandwidths are the same for both sides
-    # Note: density bands choose different bands by default, but the value seems to be sensitive to the option. I'll keep them as their default.
-    eval(parse(text = paste0(paste0("list.resultRDRobustZ <- rdrobust(y=df.data$vec.Z.",d),",x=df.data$vec.X,rho=1,bwselect='mserd')")))
+    # Note: density bands choose different bands by default, but the value seems to be senseitive to the option. I'll keep them as their default.
+    eval(parse(text = paste0(paste0("list.resultRDRobustZ <- rdrobust::rdrobust(y=df.data$vec.Z.",d),",x=df.data$vec.X,rho=1,bwselect='mserd')")))
 
     # Zstat
     real.statTZ <- list.resultRDRobustZ$z[3]
@@ -89,14 +89,15 @@ computeStatMax <- function(df.data,int.dimZ,bool.joint,int.J,bool.maxTestVinv,bo
     vec.seZ[d] <- list.resultRDRobustZ$se[3]
     vec.hL[d] <- list.resultRDRobustZ$bws[1,1]
     vec.hR[d] <- list.resultRDRobustZ$bws[1,2]
+    real.effectiveNMeanZ <- real.effectiveNMeanZ + sum(list.resultRDRobustZ$N_h)/int.dimZ
+
     if (is.null(fun.adjustBand) == FALSE) {
       vec.hL[d] <- vec.hL[d]*fun.adjustBand(int.dimZ)
       vec.hR[d] <- vec.hR[d]*fun.adjustBand(int.dimZ)
-      eval(parse(text = paste0(paste0("list.resultRDRobustZ <- rdrobust(y=df.data$vec.Z.",d),",x=df.data$vec.X,rho=1,h=c(vec.hL[d],vec.hR[d]))")))
+      eval(parse(text = paste0(paste0("list.resultRDRobustZ <- rdrobust::rdrobust(y=df.data$vec.Z.",d),",x=df.data$vec.X,rho=1,h=c(vec.hL[d],vec.hR[d]))")))
     }
-    real.effectiveNMeanZ <- real.effectiveNMeanZ + sum(list.resultRDRobustZ$N_h)/int.dimZ
 
-    eval(parse(text = paste0(paste0("list.resultRDRobustZBias <- rdrobust(y=df.data$vec.Z.",d),",x=df.data$vec.X,p=2,rho=1,h=c(vec.hL[d],vec.hR[d]))")))
+    eval(parse(text = paste0(paste0("list.resultRDRobustZBias <- rdrobust::rdrobust(y=df.data$vec.Z.",d),",x=df.data$vec.X,p=2,rho=1,h=c(vec.hL[d],vec.hR[d]))")))
 
     vec.VRobustL[d] <- list.resultRDRobustZ$V_rb_l[1,1]
     vec.VRobustR[d] <- list.resultRDRobustZ$V_rb_r[1,1]
@@ -135,7 +136,7 @@ computeStatMax <- function(df.data,int.dimZ,bool.joint,int.J,bool.maxTestVinv,bo
     mat.betaL[d,] <- list.resultRDRobustZBias$beta_p_l
     mat.betaR[d,] <- list.resultRDRobustZBias$beta_p_r
 
-    # This residual should be the raw conditional mean projection errors of Z, not normalized by bandwidths
+    # This residual should be the raw coonditional mean projection errors of Z, not normalized by bandwidths
     vec.residualL <- vec.ZL - (mat.betaL[d,1] + mat.betaL[d,2]*vec.XL + mat.betaL[d,3]*vec.XL^2)
     vec.residualR <- vec.ZR - (mat.betaR[d,1] + mat.betaR[d,2]*vec.XR + mat.betaR[d,3]*vec.XR^2)
 
@@ -193,32 +194,40 @@ computeStatMax <- function(df.data,int.dimZ,bool.joint,int.J,bool.maxTestVinv,bo
   mat.Cov <- mat.CovL + mat.CovR
   # Z.stat is standardized vector: multiply the se back
   # also, multiply hk^(1/2): we take vec.hL here, but not that bandwidths are chosen to be the same for both sides.
-  for (l in 1:int.dimZ) {vec.statTZ[l] <- vec.statTZ[l]*vec.seZ[l]*(vec.hL[l]^(1/2))/sqrt(mat.Cov[l,l])}
+  ## Why are we multiplying the bandwidth here? because we are allowing for different bands by l, but doing so through Var matrix adjustment.
+  for (l in 1:int.dimZ) {vec.statTZ[l] <- vec.statTZ[l]*vec.seZ[l]*(vec.hL[l]^(1/2))}
 
-  mat.Cor <- cov2cor(mat.Cov)
-
-  if (bool.maxTestVinv) {
-    if (bool.knownV == TRUE) {
-      mat.Cor <- diag(int.dimZ)
-      for (l1 in 1:int.dimZ) { for (l2 in 1:int.dimZ) {if (l1 != l2) {mat.Cor[l1,l2] = real.covZ} }}
+  if (bool.knownV == FALSE) {
+    if (bool.chisqStd == TRUE) {
+      # standardize the statistics by the SE of the constructed Cov matrix
+      vec.statTZStd <- vec.statTZ
+      for (l in 1:int.dimZ) {vec.statTZStd[l] <- vec.statTZStd[l]/sqrt(mat.Cov[l,l])}
+      # this does not follow chisq, hence we need to simulate the critical value.
+      real.statChiSq <- t(vec.statTZStd) %*% vec.statTZStd
+      mat.Cor <- stats::cov2cor(mat.Cov)
+    } else {
+      mat.Cor <- NA
+      real.statChiSq <- t(vec.statTZ) %*% chol2inv(chol(mat.Cov)) %*% vec.statTZ
     }
-    U <- svd(mat.Cor)$u
-    V <- svd(mat.Cor)$v
-    D2inv <- sqrt(chol2inv(chol(diag(sqrt(svd(mat.Cor)$d)))))
-    mat.CorSqrtInv <- U %*% D2inv %*% t(V)
-    # take it to the identity matrix
-    mat.Cor <- diag(int.dimZ)
-    real.statMax <- max((mat.CorSqrtInv %*% vec.statTZ)^2)
   } else {
-    real.statMax <- max(vec.statTZ^2)
+    for (l in 1:int.dimZ) {vec.statTZ[l] <- vec.statTZ[l]/sqrt(mat.Cov[l,l])}
+    mat.Cor <- diag(int.dimZ)
+    for (l1 in 1:int.dimZ) {
+      for (l2 in 1:int.dimZ) {
+        if (l1 != l2) {mat.Cor[l1,l2] <- real.covZ}
+      }
+    }
+    real.statChiSq <- t(vec.statTZ) %*% chol2inv(chol(mat.Cor)) %*% vec.statTZ
   }
-  list.resultCovariatesStatMax <- list(real.statMax=real.statMax,
-                                    mat.Cor = mat.Cor,
+
+  list.resultCovariatesPart <- list(real.statChiSq=real.statChiSq,
+                                    mat.Cor=mat.Cor,
+                                    bool.chisqStd=bool.chisqStd,
                                     bool.rejectBonferroniNull=bool.rejectBonferroniNull,
                                     bool.rejectNaiveNull=bool.rejectNaiveNull,
                                     real.meanStatTZ=real.meanStatTZ,
                                     real.medianStatTZ=real.medianStatTZ,
                                     real.maxAbsStatTZ=real.maxAbsStatTZ,
                                     real.effectiveNMeanZ=real.effectiveNMeanZ)
-  return(list.resultCovariatesStatMax)
+  return(list.resultCovariatesPart)
 }
