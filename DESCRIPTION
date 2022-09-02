@@ -22,3 +22,9 @@ LazyData: true
 RoxygenNote: 7.2.1
 URL: https://arxiv.org/abs/2205.04345
 BugReports: https://github.com/SMasa11/rdtest/issues
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder: knitr
+Config/testthat/edition: 3
