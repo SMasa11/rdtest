@@ -4,14 +4,14 @@
 \alias{return_random_stat}
 \title{return_random_stat}
 \usage{
-return_random_stat(int_num_simul, int_dim, mat_Cor)
+return_random_stat(int_num_simul, int_dim, mat_cor)
 }
 \arguments{
 \item{int_num_simul}{Integer, number of simulation draws.}
 
 \item{int_dim}{Integer, dimension to generate the draws.}
 
-\item{mat_Cor}{Matrix, correlation matrix of the target random variable.}
+\item{mat_cor}{Matrix, correlation matrix of the target random variable.}
 }
 \description{
 return_random_stat

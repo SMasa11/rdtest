@@ -16,16 +16,14 @@
 #'  default is FALSE
 #' @param int_J Integer, nearest neighbor for the variance estimation <= 3
 #'  default is 3.
-#' @param bool_maxTest Boolean, use max test instead of L2 test,
+#' @param bool_max_test Boolean, use max test instead of L2 test,
 #'  default is false.
-#' @param bool_maxTestVinv Boolean, option for using inverse V for max test.
-#' @param bool_knownV Boolean, option for setting V as known.
-#' @param fun.adjustBand Function, returns a fraction of reduced bandwidth.
-#' @param bool_chisqStd Boolean, for using standardized t stat for L2 test.
+#' @param bool_max_test_V_inv Boolean, option for using inverse V for max test.
+#' @param bool_L2_std Boolean, for using standardized t stat for L2 test.
 #'
 ####
 
-returnResultsMCJointTest <- function(int_ns = 300,
+return_result_MC_joint <- function(int_ns = 300,
                                      x_jump,
                                      jump,
                                      a_2,
@@ -35,11 +33,9 @@ returnResultsMCJointTest <- function(int_ns = 300,
                                      frac_jump = "Half",
                                      bool_mutePrint = FALSE,
                                      int_J = 3,
-                                     bool_maxTest = FALSE,
-                                     bool_maxTestVinv = FALSE,
-                                     bool_knownV = FALSE,
-                                     fun_adjustBand = NULL,
-                                     bool_chisqStd = FALSE)
+                                     bool_max_test = FALSE,
+                                     bool_max_test_V_inv = FALSE,
+                                     bool_L2_std = FALSE)
 {
   set.seed(52622)
 
@@ -74,52 +70,50 @@ returnResultsMCJointTest <- function(int_ns = 300,
       + (1.27*x + 7.18*x^2 + 20.21*x^3 + 21.54*x^4 + 7.33*x^5)*(x < 0)
       + (0.84*x - 3.00*x^2 + 7.99*x^3 - 9.01*x^4 + 3.56*x^5)*(x >= 0))}
 
-  options <- list(int.DGP = 3,
-                  int.n = n,
-                  real.jumpX = x_jump,
-                  real.jumpZ = jump,
-                  real.a2Param = a_2,
-                  int.dimZ = dim,
-                  real.covZ = cov_z,
-                  str.fracJumpZ = frac_jump,
-                  fun.mu = fun_mu)
+  option <- list(int_DGP = 3,
+                  int_n = n,
+                  real_jump_X = x_jump,
+                  real_jump_Z = jump,
+                  real_a_2_param = a_2,
+                  int_dim_Z = dim,
+                  real_cov_Z = cov_z,
+                  str_frac_jump_Z = frac_jump,
+                  fun_mu = fun_mu)
 
   for (loop in 1:ns)
   {
-    data <- simulateDGPs(options)
+    data <- simulate_DGP(option)
     list.resultJointTest <- return_result_joint(
       df_data = data,
-      int_dimZ = options$int.dimZ,
+      int_dim_Z = option$int_dim_Z,
       int_J = int_J,
-      bool_maxTest = bool_maxTest,
-      bool_maxTestVinv = bool_maxTestVinv,
-      bool_knownV = bool_knownV,
-      real_covZ = cov_z,
-      fun_adjustBand = fun_adjustBand,
-      bool_chisqStd = bool_chisqStd)
+      bool_max_test = bool_max_test,
+      bool_max_test_V_inv = bool_max_test_V_inv,
+      bool_L2_std = bool_L2_std,
+      bool_joint = TRUE)
 
     naive.num.reject <-
-      naive.num.reject + list.resultJointTest$bool.rejectNaiveNull
+      naive.num.reject + list.resultJointTest$bool_reject_naive_null
     bonfe.num.reject <-
-      bonfe.num.reject + list.resultJointTest$bool.rejectBonferroniNull
+      bonfe.num.reject + list.resultJointTest$bool_reject_bonferroni_null
     joint.num.reject <-
-      joint.num.reject + list.resultJointTest$bool.rejectJointNull
+      joint.num.reject + list.resultJointTest$bool_reject_joint_null
 
-    if (bool_maxTest == FALSE) {
-      chi.stat.vec[loop] <- list.resultJointTest$real.statChiSq
+    if (bool_max_test == FALSE) {
+      chi.stat.vec[loop] <- list.resultJointTest$real_stat
     } else {
-      vec.statMaxJoint[loop]  <- list.resultJointTest$real.statMaxJoint
+      vec.statMaxJoint[loop]  <- list.resultJointTest$real_stat
     }
-    mean.jump.z.vec[loop] <- list.resultJointTest$real.meanStatTZ
-    median.jump.z.vec[loop] <- list.resultJointTest$real.medianStatTZ
-    max.jump.z.vec[loop] <- list.resultJointTest$real.maxAbsStatTZ
-    effN.z.vec[loop] <- list.resultJointTest$real.effectiveNMeanZ
-    effN.x.vec[loop] <- list.resultJointTest$real.effNx
+    mean.jump.z.vec[loop] <- list.resultJointTest$real_mean_tstat_Z
+    median.jump.z.vec[loop] <- list.resultJointTest$real_median_tstat_Z
+    max.jump.z.vec[loop] <- list.resultJointTest$real_max_abs_tstat_Z
+    effN.z.vec[loop] <- list.resultJointTest$real_effective_N_mean_Z
+    effN.x.vec[loop] <- list.resultJointTest$real_eff_N_x
     if (dim > 1) {
-      covZ1Z2.vec[loop] <- list.resultJointTest$real.covZ1Z2
+      covZ1Z2.vec[loop] <- list.resultJointTest$real_cov_Z1_Z2
     }
 
-    vec.criticalValue[loop] <- list.resultJointTest$real.criticalValueJoint
+    vec.criticalValue[loop] <- list.resultJointTest$real_critical_value_joint
 
     if (loop %% 100 == 0)
     {
@@ -148,7 +142,7 @@ returnResultsMCJointTest <- function(int_ns = 300,
     print("bonferroni rejection rate")
     print(bonfe.num.reject/ns)
     print("joint rejection rate")
-    if (bool_maxTest == FALSE) {joint.num.reject <- joint.num.reject[1,1]}
+    if (bool_max_test == FALSE) {joint.num.reject <- joint.num.reject[1,1]}
     print(joint.num.reject/ns)
   }
 
