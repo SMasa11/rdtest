@@ -2,12 +2,5 @@
 
 export(load_option_simulation)
 export(rdtest)
-export(returnResultsChiIndependence)
-export(returnResultsJointTestAdjustedSize)
-export(returnResultsJointTestVariableCritical)
-export(returnResultsMCCovariateBalance)
-export(returnResultsMCJointTestAdjustedSize)
-export(returnResultsMCJointTestVariableCritical)
-export(returnResultsMCOrthogonalStats)
 export(simulateCustomDGPs)
 export(simulate_DGP)
