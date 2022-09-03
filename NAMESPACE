@@ -2,5 +2,4 @@
 
 export(load_option_simulation)
 export(rdtest)
-export(simulateCustomDGPs)
 export(simulate_DGP)

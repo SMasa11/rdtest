@@ -83,37 +83,38 @@ return_result_MC_joint <- function(int_ns = 300,
   for (loop in 1:ns)
   {
     data <- simulate_DGP(option)
-    list.resultJointTest <- return_result_joint(
-      df_data = data,
-      int_dim_Z = option$int_dim_Z,
-      int_J = int_J,
-      bool_max_test = bool_max_test,
-      bool_max_test_V_inv = bool_max_test_V_inv,
-      bool_L2_std = bool_L2_std,
-      bool_joint = TRUE)
+
+    list_result_joint <- rdtest(df_Z = data[,1:option$int_dim_Z],
+                                vec_X = data[,option$int_dim_Z+1],
+                                bool_joint = TRUE,
+                                int_J = int_J,
+                                real_cutoff = 0,
+                                bool_max_test = bool_max_test,
+                                bool_max_test_V_inv = bool_max_test_V_inv,
+                                bool_L2_std = bool_L2_std)
 
     naive.num.reject <-
-      naive.num.reject + list.resultJointTest$bool_reject_naive_null
+      naive.num.reject + list_result_joint$bool_reject_naive_null
     bonfe.num.reject <-
-      bonfe.num.reject + list.resultJointTest$bool_reject_bonferroni_null
+      bonfe.num.reject + list_result_joint$bool_reject_bonferroni_null
     joint.num.reject <-
-      joint.num.reject + list.resultJointTest$bool_reject_joint_null
+      joint.num.reject + list_result_joint$bool_reject_joint_null
 
     if (bool_max_test == FALSE) {
-      chi.stat.vec[loop] <- list.resultJointTest$real_stat
+      chi.stat.vec[loop] <- list_result_joint$real_stat
     } else {
-      vec.statMaxJoint[loop]  <- list.resultJointTest$real_stat
+      vec.statMaxJoint[loop]  <- list_result_joint$real_stat
     }
-    mean.jump.z.vec[loop] <- list.resultJointTest$real_mean_tstat_Z
-    median.jump.z.vec[loop] <- list.resultJointTest$real_median_tstat_Z
-    max.jump.z.vec[loop] <- list.resultJointTest$real_max_abs_tstat_Z
-    effN.z.vec[loop] <- list.resultJointTest$real_effective_N_mean_Z
-    effN.x.vec[loop] <- list.resultJointTest$real_eff_N_x
+    mean.jump.z.vec[loop] <- list_result_joint$real_mean_tstat_Z
+    median.jump.z.vec[loop] <- list_result_joint$real_median_tstat_Z
+    max.jump.z.vec[loop] <- list_result_joint$real_max_abs_tstat_Z
+    effN.z.vec[loop] <- list_result_joint$real_effective_N_mean_Z
+    effN.x.vec[loop] <- list_result_joint$real_eff_N_x
     if (dim > 1) {
-      covZ1Z2.vec[loop] <- list.resultJointTest$real_cov_Z1_Z2
+      covZ1Z2.vec[loop] <- list_result_joint$real_cov_Z1_Z2
     }
 
-    vec.criticalValue[loop] <- list.resultJointTest$real_critical_value_joint
+    vec.criticalValue[loop] <- list_result_joint$real_critical_value_joint
 
     if (loop %% 100 == 0)
     {

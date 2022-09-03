@@ -10,7 +10,7 @@ return_result_joint(
   int_J = 3,
   bool_max_test = FALSE,
   bool_max_test_V_inv = FALSE,
-  bool_L2_std = FALSE,
+  bool_L2_std = TRUE,
   bool_joint = TRUE
 )
 }

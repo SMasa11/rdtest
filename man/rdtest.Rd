@@ -4,20 +4,33 @@
 \alias{rdtest}
 \title{Main Test Function}
 \usage{
-rdtest(Z, X, bool_balance, int_J = 3, real_cutoff = 0, bool_max_test = TRUE)
+rdtest(
+  df_Z,
+  vec_X,
+  bool_joint = TRUE,
+  int_J = 3,
+  real_cutoff = 0,
+  bool_max_test = FALSE,
+  bool_max_test_V_inv = FALSE,
+  bool_L2_std = TRUE
+)
 }
 \arguments{
-\item{Z}{data frame of pre-determined covariates}
+\item{df_Z}{Data.frame, pre-determined covariates}
 
-\item{X}{vector of the running variable X}
+\item{vec_X}{Vector, running variable X}
 
-\item{bool_balance}{Boolean TRUE if joint balance test of z should be run}
+\item{bool_joint}{Boolean, TRUE if joint test instead of balance test only.}
 
 \item{int_J}{integer of nearest neighbor for the variance estimation <= 3}
 
 \item{real_cutoff}{scalar real of cutoff value, default = 0}
 
 \item{bool_max_test}{Boolean,}
+
+\item{bool_max_test_V_inv}{Boolean, option for using inverse V for max test.}
+
+\item{bool_L2_std}{Boolean, for using standardized t stat for L2 test.}
 }
 \description{
 Main Test Function

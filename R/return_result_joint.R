@@ -17,7 +17,7 @@ return_result_joint <- function(df_data,
                                int_J = 3,
                                bool_max_test = FALSE,
                                bool_max_test_V_inv = FALSE,
-                               bool_L2_std = FALSE,
+                               bool_L2_std = TRUE,
                                bool_joint = TRUE)
 {
   int_num_simul_draw <- 3000
