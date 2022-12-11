@@ -105,7 +105,6 @@ compute_test_stat <- function(df_data,
     real_effective_N_mean_Z <- real_effective_N_mean_Z +
       sum(list_result_rdrobust_Z$N_h)/int_dim_Z
 
-
     eval(parse(text = paste0(paste0(
       "list_result_rdrobust_Z_bias <- rdrobust::rdrobust(y=df_data$vec_Z.",d),
       ",x=df_data$vec_X,p=2,rho=1,h=c(vec_h_L[d],vec_h_R[d]))"

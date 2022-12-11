@@ -29,12 +29,12 @@ rdtest <- function(df_Z,
 
   if (!(length(vec_X) == length(t(vec_X)))) {
     stop("vec_X should be a vector of a single variable")}
-  if (!is.data.frame(df_Z)) {
-    stop("df_Z must be a data.frame of pre-determined covariates")}
+  # if (!is.data.frame(df_Z)) {
+  #   stop("df_Z must be a data.frame of pre-determined covariates")}
   if (max(is.nan(vec_X))) {
     stop("vec_X should not contain NaN")}
-  for (i in length(df_Z)) {
-    if (max(is.nan(df_Z[,i]))) {stop("df_Z should not contain NaN")}}
+  # for (i in length(df_Z)) {
+  #   if (max(is.nan(df_Z[,i]))) {stop("df_Z should not contain NaN")}}
 
   #! CHECK IF int.J is integer >= 1
   if (length(int_J) == 0) {stop("int.J must not be empty")}
@@ -44,8 +44,8 @@ rdtest <- function(df_Z,
   if (length(real_cutoff) > 1) {stop("real.cutoff must be a scalar")}
   #! CHECK IF Z is data.frame
   #! CHECK IF X is a vector of a single variable
-  if (!(length(vec_X) == length(df_Z[,1]))) {
-    stop("Number of observations should match for X and Z.")}
+  # if (!(length(vec_X) == length(df_Z[,1]))) {
+  #   stop("Number of observations should match for X and Z.")}
 
   #! CHECK IF bool_joint is boolean
   if (!(bool_joint == 0) & !(bool_joint == 1)) {
@@ -59,9 +59,19 @@ rdtest <- function(df_Z,
   # Normalize X to have 0 at the cutoff
   vec_X <- vec_X - real_cutoff
 
-  # Load the dataset
-  # as the colnames removed, Z is labeled as vec.Z.1, vec.Z.2 ,...
-  df_data <- data.frame(vec_Z = df_Z,vec_X = vec_X)
+  # making df_Z a data.frame by repeating vector, but keeping int_dim_Z = 1
+  if (int_dim_Z == 1) {
+    # the second argument will be discarded
+    df_data <- data.frame(vec_Z.1 = df_Z, vec_X = vec_X)
+  } else {
+    # Load the dataset
+    # as the colnames removed, Z is labeled as vec.Z.1, vec.Z.2 ,...
+    df_data <- data.frame(vec_Z = df_Z,vec_X = vec_X)
+  }
+
+  # if (int_dim_Z == 1) {
+  #  df_data <- cbind(df_data$vec_Z.1,df_data$vec_X)
+  # }
 
   list_result <- return_result_joint(
     df_data = df_data,
