@@ -7,7 +7,7 @@ library(truncnorm)
 
 test_that("the vignette process for the first loop does not change",{
 
-  int_ns <- 3
+  int_ns <- 10
 
   fun_runnerJoint = function(str_spec)
   {
@@ -155,35 +155,6 @@ test_that("the vignette process for the first loop does not change",{
                                       z_jump = z_jump,
                                       bool_max_test = TRUE,
                                       bool_max_test_V_inv=FALSE,
-                                      counter = counter,
-                                      df_resultJointTest = df_resultJointTest,
-                                      frac_jump = frac_jump,
-                                      spec = spec)
-                  counter <- counter + 1
-              }
-            }
-          }
-          for (x_jump in vec_xJump) {
-            for (z_jump in vec_zJump) {
-              if ((x_jump > 0.000001) | (x_jump == 0 & z_jump == 0)) {
-                  spec <- paste0("int_ns=",int_ns,
-                                 ",a_2=",0,
-                                 ",x_jump=",x_jump,
-                                 ",jump=",z_jump,
-                                 ",dim=",dim,
-                                 ",n=",n,
-                                 ",cov_z =", cov_z,
-                                 ",frac_jump=",frac_jump,
-                                 ",bool_mutePrint=TRUE,bool_max_test=",TRUE,
-                                 ",bool_max_test_V_inv=",TRUE)
-                  df_resultJointTest <-
-                    fun_repeaterJoint(n = n,
-                                      cov_z = cov_z,
-                                      dim = dim,
-                                      x_jump = x_jump,
-                                      z_jump = z_jump,
-                                      bool_max_test = TRUE,
-                                      bool_max_test_V_inv=TRUE,
                                       counter = counter,
                                       df_resultJointTest = df_resultJointTest,
                                       frac_jump = frac_jump,
