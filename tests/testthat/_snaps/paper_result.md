@@ -423,7 +423,6 @@
           <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">p.bonferroni</th>
           <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">p.joint</th>
           <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">isMaxTest</th>
-          <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">isMaxInv</th>
           <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1">isChiStd</th>
         </tr>
       </thead>
@@ -435,7 +434,6 @@
     <td class="gt_row gt_right">0</td>
     <td class="gt_row gt_right">0</td>
     <td class="gt_row gt_center">TRUE</td>
-    <td class="gt_row gt_center">FALSE</td>
     <td class="gt_row gt_center">FALSE</td></tr>
         <tr><td class="gt_row gt_right">500</td>
     <td class="gt_row gt_right">0.5</td>
@@ -444,7 +442,6 @@
     <td class="gt_row gt_right">0</td>
     <td class="gt_row gt_right">0</td>
     <td class="gt_row gt_center">FALSE</td>
-    <td class="gt_row gt_center">FALSE</td>
     <td class="gt_row gt_center">FALSE</td></tr>
         <tr><td class="gt_row gt_right">500</td>
     <td class="gt_row gt_right">0.5</td>
@@ -452,7 +449,6 @@
     <td class="gt_row gt_right">0.2</td>
     <td class="gt_row gt_right">0</td>
     <td class="gt_row gt_right">0</td>
-    <td class="gt_row gt_center">FALSE</td>
     <td class="gt_row gt_center">FALSE</td>
     <td class="gt_row gt_center">TRUE</td></tr>
       </tbody>

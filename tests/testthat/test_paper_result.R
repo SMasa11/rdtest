@@ -68,7 +68,6 @@ test_that("the vignette process for the first loop does not change",{
                                 x_jump,
                                 z_jump,
                                 bool_max_test,
-                                bool_max_test_V_inv,
                                 bool_L2_std = FALSE,
                                 counter,
                                 df_resultJointTest,
@@ -112,7 +111,6 @@ test_that("the vignette process for the first loop does not change",{
                        vec_bonfeReportResult = real_bonfeReportResult,
                        vec_jointReportResult = real_jointReportResult,
                        vec_maxTestSpec = real_maxTestSpec,
-                       vec_maxTestInvSpec = bool_max_test_V_inv,
                        vec_L2_std = bool_L2_std,
                        vec_avgMaxTestCritical = real_avgMaxTestCritical,
                        vec_medianMaxTestCritical = real_medianMaxTestCritical,
@@ -133,7 +131,7 @@ test_that("the vignette process for the first loop does not change",{
               ",dim=",dim,
               ",cov_z=",cov_z,
               ",frac=", frac_jump,".\n")
-          # bool_maxTest TRUE, bool_maxTestVinv FALSE
+          # bool_maxTest TRUE
           for (x_jump in vec_xJump) {
             for (z_jump in vec_zJump) {
               if ((x_jump > 0.000001) | (x_jump == 0 & z_jump == 0)) {
@@ -145,8 +143,7 @@ test_that("the vignette process for the first loop does not change",{
                                  ",n=",n,
                                  ",cov_z =", cov_z,
                                  ",frac_jump=",frac_jump,
-                                 ",bool_mutePrint=TRUE,bool_max_test=",TRUE,
-                                 ",bool_max_test_V_inv=",FALSE)
+                                 ",bool_mutePrint=TRUE,bool_max_test=",TRUE)
                   df_resultJointTest <-
                     fun_repeaterJoint(n = n,
                                       cov_z = cov_z,
@@ -154,7 +151,6 @@ test_that("the vignette process for the first loop does not change",{
                                       x_jump = x_jump,
                                       z_jump = z_jump,
                                       bool_max_test = TRUE,
-                                      bool_max_test_V_inv=FALSE,
                                       counter = counter,
                                       df_resultJointTest = df_resultJointTest,
                                       frac_jump = frac_jump,
@@ -175,8 +171,7 @@ test_that("the vignette process for the first loop does not change",{
                                  ",n=",n,
                                  ",cov_z =", cov_z,
                                  ",frac_jump=",frac_jump,
-                                 ",bool_mutePrint=TRUE,bool_max_test=",FALSE,
-                                 ",bool_max_test_V_inv=",FALSE)
+                                 ",bool_mutePrint=TRUE,bool_max_test=",FALSE)
                   df_resultJointTest <-
                     fun_repeaterJoint(n = n,
                                       cov_z = cov_z,
@@ -184,7 +179,6 @@ test_that("the vignette process for the first loop does not change",{
                                       x_jump = x_jump,
                                       z_jump = z_jump,
                                       bool_max_test = FALSE,
-                                      bool_max_test_V_inv = FALSE,
                                       counter = counter,
                                       df_resultJointTest = df_resultJointTest,
                                       frac_jump = frac_jump,
@@ -206,7 +200,6 @@ test_that("the vignette process for the first loop does not change",{
                                  ",cov_z =", cov_z,
                                  ",frac_jump=",frac_jump,
                                  ",bool_mutePrint=TRUE,bool_max_test=",FALSE,
-                                 ",bool_max_test_V_inv=",FALSE,
                                  ",bool_L2_std=",TRUE)
                   df_resultJointTest <-
                     fun_repeaterJoint(n = n,
@@ -215,7 +208,6 @@ test_that("the vignette process for the first loop does not change",{
                                       x_jump = x_jump,
                                       z_jump = z_jump,
                                       bool_max_test = FALSE,
-                                      bool_max_test_V_inv = FALSE,
                                       counter = counter,
                                       df_resultJointTest = df_resultJointTest,
                                       frac_jump = frac_jump,
@@ -237,8 +229,7 @@ test_that("the vignette process for the first loop does not change",{
                             p.bonferroni = df_resultJointTest[,9],
                             p.joint = df_resultJointTest[,10],
                             isMaxTest = df_resultJointTest[,11],
-                            isMaxInv = df_resultJointTest[,12],
-                            isChiStd = df_resultJointTest[,13])
+                            isChiStd = df_resultJointTest[,12])
   testthat::expect_snapshot_output(df_coverage %>% gt())
 
   vec_xJump <- c(0.15)
@@ -340,7 +331,7 @@ test_that("the vignette process for the first loop does not change",{
               ",dim=",dim,
               ",cov_z=",cov_z,
               ",frac=", frac_jump,".\n")
-          # bool_maxTest TRUE, bool_maxTestVinv FALSE
+          # bool_maxTest TRUE
           for (x_jump in vec_xJump) {
             for (z_jump in vec_zJump) {
               if ((x_jump > 0.000001) | (x_jump == 0 & z_jump == 0)) {
@@ -352,8 +343,7 @@ test_that("the vignette process for the first loop does not change",{
                                  ",n=",n,
                                  ",cov_z =", cov_z,
                                  ",frac_jump=",frac_jump,
-                                 ",bool_mutePrint=TRUE,bool_max_test=",TRUE,
-                                 ",bool_max_test_V_inv=",FALSE)
+                                 ",bool_mutePrint=TRUE,bool_max_test=",TRUE)
                   df_resultJointTest <-
                     fun_repeaterJoint(n = n,
                                       cov_z = cov_z,
@@ -380,8 +370,7 @@ test_that("the vignette process for the first loop does not change",{
                                  ",n=",n,
                                  ",cov_z =", cov_z,
                                  ",frac_jump=",frac_jump,
-                                 ",bool_mutePrint=TRUE,bool_max_test=",FALSE,
-                                 ",bool_max_test_V_inv=",FALSE)
+                                 ",bool_mutePrint=TRUE,bool_max_test=",FALSE)
                   df_resultJointTest <-
                     fun_repeaterJoint(n = n,
                                       cov_z = cov_z,
@@ -410,7 +399,6 @@ test_that("the vignette process for the first loop does not change",{
                                  ",cov_z =", cov_z,
                                  ",frac_jump=",frac_jump,
                                  ",bool_mutePrint=TRUE,bool_max_test=",FALSE,
-                                 ",bool_max_test_V_inv=",FALSE,
                                  ",bool_L2_std=",TRUE)
                   df_resultJointTest <-
                     fun_repeaterJoint(n = n,

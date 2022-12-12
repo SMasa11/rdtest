@@ -21,6 +21,7 @@
 #' @param bool_max_test_V_inv Boolean, option for using inverse V for max test.
 #' @param bool_L2_std Boolean, for using standardized t stat for L2 test.
 #'
+#' @export
 ####
 
 return_result_MC_joint <- function(int_ns = 300,

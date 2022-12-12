@@ -2,4 +2,5 @@
 
 export(load_option_simulation)
 export(rdtest)
+export(return_result_MC_joint)
 export(simulate_DGP)
