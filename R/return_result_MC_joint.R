@@ -86,7 +86,7 @@ return_result_MC_joint <- function(int_ns = 300,
     data <- simulate_DGP(option)
 
     if (option$int_dim_Z == 1) {
-      list_result_joint <- rdtest(df_Z = data.frame(vec_Z.1=data$vec_Z.1),
+      list_result_joint <- rdtest(Z = data.frame(vec_Z.1=data$vec_Z.1),
                                   vec_X = data$vec_X,
                                   bool_joint = TRUE,
                                   int_J = int_J,
@@ -95,7 +95,7 @@ return_result_MC_joint <- function(int_ns = 300,
                                   bool_max_test_V_inv = bool_max_test_V_inv,
                                   bool_L2_std = bool_L2_std)
     } else {
-      list_result_joint <- rdtest(df_Z = data[,1:option$int_dim_Z],
+      list_result_joint <- rdtest(Z = data[,1:option$int_dim_Z],
                                   vec_X = data[,option$int_dim_Z+1],
                                   bool_joint = TRUE,
                                   int_J = int_J,
