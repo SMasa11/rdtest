@@ -1,7 +1,7 @@
 #'
 #' Main Test Function
 #'
-#' @param df_Z Data.frame, pre-determined covariates
+#' @param Z Data.frame or Vector, pre-determined covariates
 #' @param vec_X Vector, running variable X
 #' @param bool_joint Boolean, TRUE if joint test instead of balance test only.
 #' @param int_J integer of nearest neighbor for the variance estimation <= 3
@@ -13,7 +13,7 @@
 #' @export
 #'
 
-rdtest <- function(df_Z,
+rdtest <- function(Z,
                    vec_X,
                    bool_joint = TRUE,
                    int_J = 3,
@@ -24,54 +24,55 @@ rdtest <- function(df_Z,
 {
 
   #! CHECK IF int.dimZ > 0
-  if (length(df_Z) == 0) {stop("df_Z must not be empty")}
+  if (length(Z) == 0) {stop("Z must not be empty")}
   if (length(vec_X) == 0) {stop("vec_X must not be empty")}
 
   if (!(length(vec_X) == length(t(vec_X)))) {
     stop("vec_X should be a vector of a single variable")}
-  # if (!is.data.frame(df_Z)) {
-  #   stop("df_Z must be a data.frame of pre-determined covariates")}
-  if (max(is.nan(vec_X))) {
-    stop("vec_X should not contain NaN")}
-  # for (i in length(df_Z)) {
-  #   if (max(is.nan(df_Z[,i]))) {stop("df_Z should not contain NaN")}}
+  if (!is.data.frame(Z)) {
+    if (!is.numeric(Z)) {
+      stop("Z must be either a data.frame
+            or a vector of pre-determined covariates")
+    } else {
+        Z = data.frame(vec_Z = Z)
+    }
+  }
+  if (max(is.nan(vec_X)) | max(is.na(vec_X))) {
+    stop("vec_X should not contain NaN or NA")}
+  for (i in length(Z)) {
+    if (max(is.nan(Z[,i])) | max(is.na(Z[,i]))) {
+      stop("Z should not contain NaN or NA")}
+    }
 
-  #! CHECK IF int.J is integer >= 1
-  if (length(int_J) == 0) {stop("int.J must not be empty")}
-  if ((int_J %% 1)) {stop("int.J need to be an integer.")}
   #! CHECK IF real.cutoff is scalar real value
-  if (length(real_cutoff) == 0) {stop("real.cutoff must not be empty")}
-  if (length(real_cutoff) > 1) {stop("real.cutoff must be a scalar")}
-  #! CHECK IF Z is data.frame
+  if (length(real_cutoff) == 0) {stop("real_cutoff must not be empty")}
+  if (length(real_cutoff) > 1) {stop("real_cutoff must be a scalar")}
+
   #! CHECK IF X is a vector of a single variable
-  # if (!(length(vec_X) == length(df_Z[,1]))) {
-  #   stop("Number of observations should match for X and Z.")}
+  if (!(length(vec_X) == length(Z[,1]))) {
+    stop("Number of observations should match for X and Z.")}
 
   #! CHECK IF bool_joint is boolean
   if (!(bool_joint == 0) & !(bool_joint == 1)) {
     stop("bool_joint need to be either 0 or 1")}
 
   # Retrieve the colnames of Z
-  vec_col_name_Z <- colnames(df_Z)
+  vec_col_name_Z <- colnames(Z)
   int_dim_Z <- length(vec_col_name_Z)
-  colnames(df_Z) <- NULL
+  colnames(Z) <- NULL
 
   # Normalize X to have 0 at the cutoff
   vec_X <- vec_X - real_cutoff
 
-  # making df_Z a data.frame by repeating vector, but keeping int_dim_Z = 1
+  # making Z a data.frame by repeating vector, but keeping int_dim_Z = 1
   if (int_dim_Z == 1) {
     # the second argument will be discarded
-    df_data <- data.frame(vec_Z.1 = df_Z, vec_X = vec_X)
+    df_data <- data.frame(vec_Z.1 = Z, vec_X = vec_X)
   } else {
     # Load the dataset
     # as the colnames removed, Z is labeled as vec.Z.1, vec.Z.2 ,...
-    df_data <- data.frame(vec_Z = df_Z,vec_X = vec_X)
+    df_data <- data.frame(vec_Z = Z,vec_X = vec_X)
   }
-
-  # if (int_dim_Z == 1) {
-  #  df_data <- cbind(df_data$vec_Z.1,df_data$vec_X)
-  # }
 
   list_result <- return_result_joint(
     df_data = df_data,
@@ -81,6 +82,89 @@ rdtest <- function(df_Z,
     bool_max_test_V_inv = bool_max_test_V_inv,
     bool_L2_std = bool_L2_std,
     bool_joint = bool_joint)
+  list_result$call <- match.call()
+  list_result$bool_max_test <- bool_max_test
+  list_result$bool_L2_std <- bool_L2_std
+  list_result$bool_joint <- bool_joint
+  list_result$vec_col_name_Z <- vec_col_name_Z
+  list_result$int_dim_Z <- int_dim_Z
+
+  class(list_result) <- "rdtest"
 
   return(list_result)
+}
+
+
+
+#'
+#' Main Test Function
+#'
+#' @export
+summary.rdtest <- function (object, ...)
+{
+  ans <- object
+
+  cat("Call: ")
+  print(ans$call)
+
+  ans$tstats <- matrix(NA, 0L, 3L,
+                       dimnames = list(NULL,
+                                       c("Variable",
+                                         "t-stat",
+                                         "(Naive) p-value")))
+
+  if (ans$bool_joint) {
+    ans$tstats <-
+      rbind(ans$tstats,
+      cbind(Variable = "density",
+            `t-stat` = round(ans$real_tstat_X,3),
+            `(Naive) p-value` =
+              round((1-pnorm(abs(ans$real_tstat_X))),3)))
+  }
+  for (i in seq(1:ans$int_dim_Z)) {
+    ans$tstats <-
+      rbind(ans$tstats,
+            cbind(Variable = ans$vec_col_name_Z[i],
+                  `t-stat` = round(ans$vec_tstat_Z_raw[i],3),
+                  `(Naive) p-value`
+                  = round((1-pnorm(abs(ans$vec_tstat_Z_raw[i]))),3)))
+  }
+
+  cat("\n Naive test results:")
+  print(knitr::kable(ans$tstats,"rst"))
+  cat("\n")
+
+  if (ans$bool_joint) {
+    cat("\n Joint test result: covariates and density.")
+  } else {
+    cat("\n Joint test result: covariates.")
+  }
+
+  ans$joint_result <- matrix(NA, 0L, 4L,
+                       dimnames = list(NULL,
+                                       c("Test Type",
+                                         "Test Statistic",
+                                         "Critical Value",
+                                         "Joint p-value")))
+
+  if (ans$bool_max_test) {
+    test_type = "Max test"
+  } else {
+    if (ans$bool_L2_std) {
+      test_type = "standardized Wald test"
+    } else {
+      test_type = "(non-standardized) Wald test"
+    }
+  }
+  ans$joint_result <-
+    rbind(ans$joint_result,
+          cbind(
+            `Test Type` = test_type,
+            `Test Statistic` = round(ans$real_stat_joint,3),
+            `Critical Value` = round(ans$real_critical_value_joint,3),
+            `Joint p-alue` = round(ans$real_pvalue,3)
+          ))
+  print(knitr::kable(ans$joint_result,"rst"))
+
+  return(ans)
 }

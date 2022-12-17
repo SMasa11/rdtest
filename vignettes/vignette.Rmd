@@ -1,0 +1,46 @@
+---
+title: "vignette"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+`Z` may be either a numeric vector or a data.frame containing covariates.
+```{r setup}
+library(rdtest)
+set.seed(1)
+N <- 1000
+Z <- data.frame(var1 = rnorm(N),
+                var2 = rnorm(N),
+                var3 = rnorm(N),
+                var4 = rnorm(N),
+                var5 = rnorm(N))
+vec_X <- rnorm(N)
+```
+
+Default option is standardized Wald statistics (`sWald`).
+```{r basic usage}
+res_rd <- rdtest::rdtest(Z = Z, vec_X = vec_X)
+ans <- summary(res_rd)
+```
+
+With `bool_max_test` option TRUE, `rdtest` returns max test result instead of `sWald` test result.
+```{r other statistics}
+res_rd <- rdtest::rdtest(Z = Z, vec_X = vec_X, bool_max_test = TRUE)
+ans <- summary(res_rd)
+```
+
+By toggling `bool_L2_std` option FALSE, `rdtest` returns non-standardized Wald test result, but in simulation, the non-standardized test does not control its size appropriately.
+```{r Not recommended}
+res_rd <- rdtest::rdtest(Z = Z, vec_X = vec_X, bool_L2_std = FALSE)
+ans <- summary(res_rd)
+```

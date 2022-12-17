@@ -89,12 +89,18 @@ compute_test_stat <- function(df_data,
   {
     # enforce the bandwidths are the same for both sides
     # Note: density bands choose different bands by default,
-    # but the value seems to be senseitive to the option.
+    # but the value seems to be sensitive to the option.
     # I'll keep them as their default.
-    eval(parse(text = paste0(paste0(
+    tryCatch({
+      eval(parse(text = paste0(paste0(
       "list_result_rdrobust_Z <- rdrobust::rdrobust(y=df_data$vec_Z.",d),
       ",x = df_data$vec_X,rho=1,bwselect='mserd')"
-      )))
+      )))},
+      error = function(e) {
+        message(paste0("ERROR at rdrobust for vec_Z.",d))
+        message(e)
+      }
+    )
 
     # Zstat
     real_tstat_Z <- list_result_rdrobust_Z$z[3]
@@ -105,10 +111,16 @@ compute_test_stat <- function(df_data,
     real_effective_N_mean_Z <- real_effective_N_mean_Z +
       sum(list_result_rdrobust_Z$N_h)/int_dim_Z
 
-    eval(parse(text = paste0(paste0(
-      "list_result_rdrobust_Z_bias <- rdrobust::rdrobust(y=df_data$vec_Z.",d),
-      ",x=df_data$vec_X,p=2,rho=1,h=c(vec_h_L[d],vec_h_R[d]))"
-      )))
+    tryCatch({
+      eval(parse(text = paste0(paste0(
+        "list_result_rdrobust_Z_bias <- rdrobust::rdrobust(y=df_data$vec_Z.",d),
+        ",x=df_data$vec_X,p=2,rho=1,h=c(vec_h_L[d],vec_h_R[d]))"
+        )))},
+      error = function(e) {
+        message(paste0("ERROR at calculating bias rdrobust for vec_Z.",d))
+        message(e)
+      }
+    )
 
     vec_V_robust_L[d] <- list_result_rdrobust_Z$V_rb_l[1,1]
     vec_V_robust_R[d] <- list_result_rdrobust_Z$V_rb_r[1,1]
@@ -187,6 +199,7 @@ compute_test_stat <- function(df_data,
     arr_Psi_R[,,d] <- diag(vec_residual_nn_R) %*% (mat_K_h_R %*% mat_X_h_sq_R)
 
   }
+  vec_tstat_Z_raw <- vec_tstat_Z
   real_mean_tstat_Z <- mean(vec_tstat_Z)
   real_median_tstat_Z <- median(vec_tstat_Z)
   real_max_abs_tstat_Z <- max(abs(vec_tstat_Z))
@@ -274,6 +287,7 @@ compute_test_stat <- function(df_data,
     real_mean_tstat_Z = real_mean_tstat_Z,
     real_median_tstat_Z = real_median_tstat_Z,
     real_max_abs_tstat_Z = real_max_abs_tstat_Z,
-    real_effective_N_mean_Z=real_effective_N_mean_Z)
+    real_effective_N_mean_Z=real_effective_N_mean_Z,
+    vec_tstat_Z_raw = vec_tstat_Z_raw)
   return(list_result_covariate_part)
 }

@@ -5,7 +5,7 @@
 \title{Main Test Function}
 \usage{
 rdtest(
-  df_Z,
+  Z,
   vec_X,
   bool_joint = TRUE,
   int_J = 3,
@@ -16,7 +16,7 @@ rdtest(
 )
 }
 \arguments{
-\item{df_Z}{Data.frame, pre-determined covariates}
+\item{Z}{Data.frame or Vector, pre-determined covariates}
 
 \item{vec_X}{Vector, running variable X}
 

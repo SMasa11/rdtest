@@ -39,7 +39,14 @@ return_result_joint <- function(df_data,
 
   int_dim_total <- int_dim_Z + bool_joint
   # Xstat
-  list_result_X <- rddensity::rddensity(X = df_data$vec_X)
+  tryCatch({
+    list_result_X <- rddensity::rddensity(X = df_data$vec_X)},
+    error = function(e) {
+      message(paste0("ERROR at rddensity"))
+      message(e)
+    }
+  )
+
   # t stat
   real_tstat_X <- list_result_X$test$t_jk
 
@@ -80,16 +87,21 @@ return_result_joint <- function(df_data,
       }
       bool_reject_joint_null <- (real_pvalue <= 0.05)
       real_critical_value_joint <- quantile(vec_random_draw_stat,0.95)
+      real_stat_joint <- real_stat_L2_std_joint
     } else {
       real_critical_value_joint <- qchisq(.95, df=int_dim_total)
       if (bool_joint) {
         bool_reject_joint_null <-
           (list_result_covariate$real_stat + real_tstat_X^2
            >= real_critical_value_joint)
+        real_stat_joint <- list_result_covariate$real_stat + real_tstat_X^2
+        real_pvalue <- 1-pchisq(real_stat_joint,df=int_dim_total)
       } else {
         bool_reject_joint_null <-
           (list_result_covariate$real_stat
            >= real_critical_value_joint)
+        real_stat_joint <- list_result_covariate$real_stat
+        real_pvalue <- 1-pchisq(real_stat_joint,df=int_dim_total)
       }
     }
   } else {
@@ -106,6 +118,7 @@ return_result_joint <- function(df_data,
       bool_reject_joint_null <-
         (real_stat_max_joint >= qchisq(0.95^(1/int_dim_total),1))
       real_critical_value_joint <- qchisq(0.95^(1/int_dim_total),1)
+      real_stat_joint <- real_stat_max_joint
     } else {
       real_stat_max_joint <-
         max(list_result_covariate$real_stat,real_tstat_X^2)
@@ -124,6 +137,7 @@ return_result_joint <- function(df_data,
         # by multiplying the corr matrix, then take square and max.
         vec_random_draw_stat[l] <- max(mat_random_draw_stat[,l]^2)
       }
+      real_stat_joint <- real_stat_max_joint
       real_pvalue <- mean((vec_random_draw_stat >= real_stat_max_joint))
       bool_reject_joint_null <- (real_pvalue <= 0.05)
       real_critical_value_joint <- quantile(vec_random_draw_stat,0.95)
@@ -150,7 +164,10 @@ return_result_joint <- function(df_data,
          bool_reject_joint_null = bool_reject_joint_null,
          bool_reject_naive_null = bool_reject_naive_null,
          bool_reject_bonferroni_null = bool_reject_bonferroni_null,
-         real_critical_value_joint = real_critical_value_joint)
+         real_critical_value_joint = real_critical_value_joint,
+         vec_tstat_Z_raw = list_result_covariate$vec_tstat_Z_raw,
+         real_pvalue = real_pvalue,
+         real_stat_joint = real_stat_joint)
   return(list_result_joint_test)
 }
 
