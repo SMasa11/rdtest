@@ -19,7 +19,7 @@ Description: This package offers a simultaneous implementation of two major
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.2
+RoxygenNote: 7.2.3
 URL: https://arxiv.org/abs/2205.04345
 BugReports: https://github.com/SMasa11/rdtest/issues
 Suggests: 
