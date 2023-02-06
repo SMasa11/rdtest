@@ -172,7 +172,17 @@ simulate_DGP = function(list_option)
     {
       for (j in 1:list_parameter$int_dim_Z)
       {
-        if (i != j) {mat_Z_Sigma[i,j] <- list_parameter$real_cov_Z}
+        if (i != j) {
+          if (list_parameter$real_cov_Z >= 0) {
+            mat_Z_Sigma[i,j] <- list_parameter$real_cov_Z
+          } else {
+            if (i == 1 | j == 1) {
+              mat_Z_Sigma[i,j] <- list_parameter$real_cov_Z
+            } else {
+              mat_Z_Sigma[i,j] <- -list_parameter$real_cov_Z
+            }
+          }
+        }
       }
     }
     bool_frac_eval_flag <- FALSE
