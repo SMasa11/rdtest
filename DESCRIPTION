@@ -28,3 +28,7 @@ Suggests:
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
+Imports: 
+    ggplot2,
+    rddensity (>= 2.4),
+    rdrobust (>= 2.1.1)

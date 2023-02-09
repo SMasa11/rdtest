@@ -166,8 +166,8 @@ compute_test_stat <- function(df_data,
     vec_Z_R <- eval(parse(text = paste0(
       paste0("df_data$vec_Z.",d),"[df_data$vec_X >= 0]")))
 
-    mat_beta_L[d,] <- list_result_rdrobust_Z_bias$beta_p_l
-    mat_beta_R[d,] <- list_result_rdrobust_Z_bias$beta_p_r
+    mat_beta_L[d,] <- list_result_rdrobust_Z_bias$beta_Y_p_l
+    mat_beta_R[d,] <- list_result_rdrobust_Z_bias$beta_Y_p_r
 
     # This residual should be the raw conditional mean projection errors of Z,
     # not normalized by bandwidths
