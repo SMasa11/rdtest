@@ -1,5 +1,5 @@
 ####
-#' return statistics for covariates balance
+#' Return statistics for covariates balance or placebo test.
 #'
 #' @inherit return_result_joint
 ####
@@ -85,22 +85,39 @@ compute_test_stat <- function(df_data,
   vec_tstat_Z <- rep(0,int_dim_Z)
   vec_se_Z <- rep(0,int_dim_Z)
 
+  list_result_rdrobust_Z <- list()
+  list_result_rdrobust_Z_bias <- list()
   for (d in 1:int_dim_Z)
   {
     # enforce the bandwidths are the same for both sides
     # Note: density bands choose different bands by default,
     # but the value seems to be sensitive to the option.
     # I'll keep them as their default.
-    tryCatch({
-      eval(parse(text = paste0(paste0(
-      "list_result_rdrobust_Z <- rdrobust::rdrobust(y=df_data$vec_Z.",d),
-      ",x = df_data$vec_X,rho=1,bwselect='mserd')"
-      )))},
-      error = function(e) {
-        message(paste0("ERROR at rdrobust for vec_Z.",d))
-        message(e)
-      }
-    )
+    if (int_dim_Z == 1) {
+      tryCatch({
+        list_result_rdrobust_Z <- rdrobust::rdrobust(
+          y=df_data$vec_Z.1,
+          x = df_data$vec_X,
+          rho=1,
+          bwselect='mserd'
+        )},
+        error = function(e) {
+          message("ERROR at rdrobust for vec_Z.1")
+          message(e)
+        }
+      )
+    } else {
+      tryCatch({
+        eval(parse(text = paste0(paste0(
+          "list_result_rdrobust_Z <- rdrobust::rdrobust(y=df_data$vec_Z.",d),
+          ",x = df_data$vec_X,rho=1,bwselect='mserd')"
+        )))},
+        error = function(e) {
+          message(paste0("ERROR at rdrobust for vec_Z.",d))
+          message(e)
+        }
+      )
+    }
 
     # Zstat
     real_tstat_Z <- list_result_rdrobust_Z$z[3]
@@ -124,10 +141,10 @@ compute_test_stat <- function(df_data,
 
     vec_V_robust_L[d] <- list_result_rdrobust_Z$V_rb_l[1,1]
     vec_V_robust_R[d] <- list_result_rdrobust_Z$V_rb_r[1,1]
-    if (abs(real_tstat_Z) > qnorm(1- 0.025)) {
+    if (abs(real_tstat_Z) > stats::qnorm(1- 0.025)) {
       bool_reject_naive_null <- TRUE
     }
-    if (abs(real_tstat_Z) > qnorm(1 - 0.025/(int_dim_Z+bool_joint))){
+    if (abs(real_tstat_Z) > stats::qnorm(1 - 0.025/(int_dim_Z+bool_joint))){
       bool_reject_bonferroni_null <- TRUE
     }
 
@@ -201,7 +218,7 @@ compute_test_stat <- function(df_data,
   }
   vec_tstat_Z_raw <- vec_tstat_Z
   real_mean_tstat_Z <- mean(vec_tstat_Z)
-  real_median_tstat_Z <- median(vec_tstat_Z)
+  real_median_tstat_Z <- stats::median(vec_tstat_Z)
   real_max_abs_tstat_Z <- max(abs(vec_tstat_Z))
 
   mat_cov_L <- matrix(rep(0,int_dim_Z^2),int_dim_Z,int_dim_Z)

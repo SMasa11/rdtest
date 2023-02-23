@@ -16,7 +16,7 @@ return_random_stat <- function(int_num_simul,
     #Generates the same random normal vector with the seed of 373568, restoring the currently loading seed
     mat_random_normal <-
       matrix(R.utils::withSeed({
-        rnorm((int_dim)*int_num_simul,0,1)},seed=373568)
+        stats::rnorm((int_dim)*int_num_simul,0,1)},seed=373568)
         ,int_dim,int_num_simul)
     U <- svd(mat_cor)$u
     V <- svd(mat_cor)$v

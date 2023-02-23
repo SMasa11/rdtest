@@ -7,7 +7,7 @@
 simulate_DGP(list_option)
 }
 \arguments{
-\item{list_option}{list}
+\item{list_option}{List, list of options that specify the DGP.}
 }
 \description{
 Simulation code for DGP

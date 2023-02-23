@@ -1,11 +1,8 @@
-####
 #' Simulating DGP
 #'
 #' Simulation code for DGP
+#' @param list_option List, list of options that specify the DGP.
 #'
-#' @param list_option list
-#' @export
-####
 
 simulate_DGP = function(list_option)
 {
@@ -147,7 +144,7 @@ simulate_DGP = function(list_option)
     # (mocking the variance of 2*B(2,4)-1),
     # D = 1 then RHS, D = 0 then LHS, pParam = 1/2
     # then no jump. 1 > pParam > 1/2 means a jump.
-    vec_D <- (runif(list_parameter$int_n) <= list_parameter$real_p_param)
+    vec_D <- (stats::runif(list_parameter$int_n) <= list_parameter$real_p_param)
     vec_X <- vec_D *
       truncnorm::rtruncnorm(n = list_parameter$int_n,
                             a = 0,

@@ -2,7 +2,7 @@
 % Please edit documentation in R/compute_test_stat.R
 \name{compute_test_stat}
 \alias{compute_test_stat}
-\title{return statistics for covariates balance}
+\title{Return statistics for covariates balance or placebo test.}
 \usage{
 compute_test_stat(
   df_data,
@@ -32,5 +32,5 @@ default is false.}
 \item{bool_joint}{Boolean, for returning joint test, instead of balance only.}
 }
 \description{
-return statistics for covariates balance
+Return statistics for covariates balance or placebo test.
 }

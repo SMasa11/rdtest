@@ -1,6 +1,6 @@
 Package: rdtest
 Type: Package
-Title: A Joint Diagnostic Test for Regression Discontinuity Designs
+Title: Joint Diagnosis for Regression Discontinuity Designs
 Version: 0.0.9000
 Authors@R: c(
   person("Masayuki","Sawada", email="m-sawada@ier.hit-u.ac.jp",
@@ -11,11 +11,10 @@ Authors@R: c(
     role = c("aut"))
   )
 Description: This package offers a simultaneous implementation of two major 
-  diagnostic tests, the density test and balance test for regression 
-  discontinuity (RD) designs. Running these tests separately result in the 
-  multiple testing problem that causes a serious over-rejection of the null 
-  hypothesis for justifying a RD design. Our joint test resolve the multiple 
-  testing problem.
+  diagnostic tests, the density test and balance (placebo) test for regression 
+  discontinuity (RD) designs. Running these tests separately result in a serious
+  over-rejection of the null hypothesis for justifying a RD design due to 
+  multiple testing problem. Our joint test resolve the multiple testing problem.
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
@@ -23,12 +22,17 @@ RoxygenNote: 7.2.3
 URL: https://arxiv.org/abs/2205.04345
 BugReports: https://github.com/SMasa11/rdtest/issues
 Suggests: 
-    knitr,
-    rmarkdown,
-    testthat (>= 3.0.0)
+    dplyr (>= 1.0.9),
+    ggplot2 (>= 3.3.6),
+    gt (>= 0.6.0),
+    rmarkdown (>= 2.14),
+    testthat (>= 3.0.0),
+    tictoc (>= 1.0.1),
+    truncnorm (>= 1.0.8)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Imports: 
-    ggplot2,
+    knitr (>= 1.39),
+    R.utils (>= 2.12.0),
     rddensity (>= 2.4),
     rdrobust (>= 2.1.1)

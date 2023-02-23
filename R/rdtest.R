@@ -1,15 +1,39 @@
 #'
-#' Main Test Function
+#' rdtest: A joint diagnosis for regression discontinuity designs.
 #'
-#' @param Z Data.frame or Vector, pre-determined covariates
-#' @param vec_X Vector, running variable X
-#' @param bool_joint Boolean, TRUE if joint test instead of balance test only.
-#' @param int_J integer of nearest neighbor for the variance estimation <= 3
-#' @param real_cutoff scalar real of cutoff value, default = 0
-#' @param bool_max_test_V_inv Boolean, option for using inverse V for max test.
-#' @param bool_L2_std Boolean, for using standardized t stat for L2 test.
-#' @param bool_max_test Boolean,
+#' The rdtest package offers a joint test of commonly used diagnostic tests for
+#' regression discontinuity designs.
 #'
+#' @param Z Data.frame or Vector, pre-determined covariates.
+#' @param vec_X Vector, running variable X.
+#' @param bool_joint Boolean, TRUE if joint test instead of balance test only,
+#'   default is TRUE.
+#' @param int_J Integer, the number or nearest neighbor for the variance
+#'   estimation, default is 3.
+#' @param real_cutoff Real scalar, cutoff value, default = 0.
+#' @param bool_L2_std Boolean, use of standardized Wald test, default is TRUE.
+#' @param bool_max_test Boolean, use of max test, instead of Wald tests, default
+#'   is FALSE.
+#' @param bool_max_test_V_inv Boolean, an option not used anymore, set to FALSE.
+#'
+#' @examples
+#' # Prepare a mock dataset
+#' library(rdtest)
+#' set.seed(1)
+#' N <- 1000
+#' Z <- data.frame(
+#'  var1 = rnorm(N),
+#'  var2 = rnorm(N),
+#'  var3 = rnorm(N),
+#'  var4 = rnorm(N),
+#'  var5 = rnorm(N))
+#'  vec_X <- rnorm(N)
+#' # Returning result with sWald test statistic
+#' res_rd <- rdtest::rdtest(Z = Z, vec_X = vec_X)
+#' summary(res_rd)
+#' # Returning result with max test statistic
+#' res_rd <- rdtest::rdtest(Z = Z, vec_X = vec_X, bool_max_test = TRUE)
+#' summary(res_rd)
 #' @export
 #'
 
@@ -79,7 +103,7 @@ rdtest <- function(Z,
     int_dim_Z = int_dim_Z,
     int_J = int_J,
     bool_max_test = bool_max_test,
-    bool_max_test_V_inv = bool_max_test_V_inv,
+    bool_max_test_V_inv = FALSE,
     bool_L2_std = bool_L2_std,
     bool_joint = bool_joint)
   list_result$call <- match.call()
@@ -97,8 +121,10 @@ rdtest <- function(Z,
 
 
 #'
-#' Main Test Function
+#' Summary function of the main caller.
 #'
+#' @param object Object rdtest, result returned from rdtest function.
+#' @param ... Other options.
 #' @export
 summary.rdtest <- function (object, ...)
 {
@@ -119,7 +145,7 @@ summary.rdtest <- function (object, ...)
       cbind(Variable = "density",
             `t-stat` = round(ans$real_tstat_X,3),
             `(Naive) p-value` =
-              round((1-pnorm(abs(ans$real_tstat_X))),3)))
+              round((1-stats::pnorm(abs(ans$real_tstat_X))),3)))
   }
   for (i in seq(1:ans$int_dim_Z)) {
     ans$tstats <-
@@ -127,7 +153,7 @@ summary.rdtest <- function (object, ...)
             cbind(Variable = ans$vec_col_name_Z[i],
                   `t-stat` = round(ans$vec_tstat_Z_raw[i],3),
                   `(Naive) p-value`
-                  = round((1-pnorm(abs(ans$vec_tstat_Z_raw[i]))),3)))
+                  = round((1-stats::pnorm(abs(ans$vec_tstat_Z_raw[i]))),3)))
   }
 
   cat("\n Naive test results:")

@@ -50,10 +50,10 @@ return_result_joint <- function(df_data,
   # t stat
   real_tstat_X <- list_result_X$test$t_jk
 
-  if (abs(real_tstat_X) > qnorm(1- 0.025)) {
+  if (abs(real_tstat_X) > stats::qnorm(1- 0.025)) {
     bool_reject_naive_null <- TRUE
   }
-  if (abs(real_tstat_X) > qnorm(1 - 0.025/int_dim_total)) {
+  if (abs(real_tstat_X) > stats::qnorm(1 - 0.025/int_dim_total)) {
     bool_reject_bonferroni_null <- TRUE
   }
 
@@ -86,22 +86,22 @@ return_result_joint <- function(df_data,
              real_stat_L2_std_joint)/int_num_simul_draw
       }
       bool_reject_joint_null <- (real_pvalue <= 0.05)
-      real_critical_value_joint <- quantile(vec_random_draw_stat,0.95)
+      real_critical_value_joint <- stats::quantile(vec_random_draw_stat,0.95)
       real_stat_joint <- real_stat_L2_std_joint
     } else {
-      real_critical_value_joint <- qchisq(.95, df=int_dim_total)
+      real_critical_value_joint <- stats::qchisq(.95, df=int_dim_total)
       if (bool_joint) {
         bool_reject_joint_null <-
           (list_result_covariate$real_stat + real_tstat_X^2
            >= real_critical_value_joint)
         real_stat_joint <- list_result_covariate$real_stat + real_tstat_X^2
-        real_pvalue <- 1-pchisq(real_stat_joint,df=int_dim_total)
+        real_pvalue <- 1-stats::pchisq(real_stat_joint,df=int_dim_total)
       } else {
         bool_reject_joint_null <-
           (list_result_covariate$real_stat
            >= real_critical_value_joint)
         real_stat_joint <- list_result_covariate$real_stat
-        real_pvalue <- 1-pchisq(real_stat_joint,df=int_dim_total)
+        real_pvalue <- 1-stats::pchisq(real_stat_joint,df=int_dim_total)
       }
     }
   } else {
@@ -116,8 +116,8 @@ return_result_joint <- function(df_data,
           max(list_result_covariate$real_stat)
       }
       bool_reject_joint_null <-
-        (real_stat_max_joint >= qchisq(0.95^(1/int_dim_total),1))
-      real_critical_value_joint <- qchisq(0.95^(1/int_dim_total),1)
+        (real_stat_max_joint >= stats::qchisq(0.95^(1/int_dim_total),1))
+      real_critical_value_joint <- stats::qchisq(0.95^(1/int_dim_total),1)
       real_stat_joint <- real_stat_max_joint
     } else {
       real_stat_max_joint <-
@@ -140,7 +140,7 @@ return_result_joint <- function(df_data,
       real_stat_joint <- real_stat_max_joint
       real_pvalue <- mean((vec_random_draw_stat >= real_stat_max_joint))
       bool_reject_joint_null <- (real_pvalue <= 0.05)
-      real_critical_value_joint <- quantile(vec_random_draw_stat,0.95)
+      real_critical_value_joint <- stats::quantile(vec_random_draw_stat,0.95)
     }
   }
 
@@ -148,8 +148,8 @@ return_result_joint <- function(df_data,
   real_cov_Z1_Z2 <- NULL
   if (int_dim_Z > 1) {
     real_cov_Z1_Z2 <-
-      cor(df_data$vec_Z.1[df_data$vec_X <= quantile(abs(df_data$vec_X),0.1)],
-          df_data$vec_Z.2[df_data$vec_X <= quantile(abs(df_data$vec_X),0.1)])}
+      stats::cor(df_data$vec_Z.1[df_data$vec_X <= stats::quantile(abs(df_data$vec_X),0.1)],
+          df_data$vec_Z.2[df_data$vec_X <= stats::quantile(abs(df_data$vec_X),0.1)])}
   real_eff_N_x <- list_result_X$N$eff_left + list_result_X$N$eff_right
 
   list_result_joint_test <-

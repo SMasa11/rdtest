@@ -34,6 +34,8 @@ default is 300.}
 
 \item{n}{Integer, sample size.}
 
+\item{cov_z}{Real, correlation of Z variables.}
+
 \item{frac_jump}{String, either "None", "Half", "All", "Last".}
 
 \item{bool_mutePrint}{Boolean, option for muting outputs.
@@ -48,8 +50,6 @@ default is false.}
 \item{bool_max_test_V_inv}{Boolean, option for using inverse V for max test.}
 
 \item{bool_L2_std}{Boolean, for using standardized t stat for L2 test.}
-
-\item{cov}{Real, correlation of Z variables.}
 }
 \description{
 Example code for simulation excercise

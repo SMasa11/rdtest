@@ -2,10 +2,15 @@
 % Please edit documentation in R/rdtest.R
 \name{summary.rdtest}
 \alias{summary.rdtest}
-\title{Main Test Function}
+\title{Summary function of the main caller.}
 \usage{
 \method{summary}{rdtest}(object, ...)
 }
+\arguments{
+\item{object}{Object rdtest, result returned from rdtest function.}
+
+\item{...}{Other options.}
+}
 \description{
-Main Test Function
+Summary function of the main caller.
 }

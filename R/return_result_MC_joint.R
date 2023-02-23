@@ -10,7 +10,7 @@
 #' @param a_2 Real, gap in heteroskedasticity.
 #' @param dim Integer, number of z variables.
 #' @param n Integer, sample size.
-#' @param cov Real, correlation of Z variables.
+#' @param cov_z Real, correlation of Z variables.
 #' @param frac_jump String, either "None", "Half", "All", "Last".
 #' @param bool_mutePrint Boolean, option for muting outputs.
 #'  default is FALSE

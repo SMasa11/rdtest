@@ -2,7 +2,7 @@
 % Please edit documentation in R/rdtest.R
 \name{rdtest}
 \alias{rdtest}
-\title{Main Test Function}
+\title{rdtest: A joint diagnosis for regression discontinuity designs.}
 \usage{
 rdtest(
   Z,
@@ -16,22 +16,45 @@ rdtest(
 )
 }
 \arguments{
-\item{Z}{Data.frame or Vector, pre-determined covariates}
+\item{Z}{Data.frame or Vector, pre-determined covariates.}
 
-\item{vec_X}{Vector, running variable X}
+\item{vec_X}{Vector, running variable X.}
 
-\item{bool_joint}{Boolean, TRUE if joint test instead of balance test only.}
+\item{bool_joint}{Boolean, TRUE if joint test instead of balance test only,
+default is TRUE.}
 
-\item{int_J}{integer of nearest neighbor for the variance estimation <= 3}
+\item{int_J}{Integer, the number or nearest neighbor for the variance
+estimation, default is 3.}
 
-\item{real_cutoff}{scalar real of cutoff value, default = 0}
+\item{real_cutoff}{Real scalar, cutoff value, default = 0.}
 
-\item{bool_max_test}{Boolean,}
+\item{bool_max_test}{Boolean, use of max test, instead of Wald tests, default
+is FALSE.}
 
-\item{bool_max_test_V_inv}{Boolean, option for using inverse V for max test.}
+\item{bool_max_test_V_inv}{Boolean, an option not used anymore, set to FALSE.}
 
-\item{bool_L2_std}{Boolean, for using standardized t stat for L2 test.}
+\item{bool_L2_std}{Boolean, use of standardized Wald test, default is TRUE.}
 }
 \description{
-Main Test Function
+The rdtest package offers a joint test of commonly used diagnostic tests for
+regression discontinuity designs.
+}
+\examples{
+# Prepare a mock dataset
+library(rdtest)
+set.seed(1)
+N <- 1000
+Z <- data.frame(
+ var1 = rnorm(N),
+ var2 = rnorm(N),
+ var3 = rnorm(N),
+ var4 = rnorm(N),
+ var5 = rnorm(N))
+ vec_X <- rnorm(N)
+# Returning result with sWald test statistic
+res_rd <- rdtest::rdtest(Z = Z, vec_X = vec_X)
+summary(res_rd)
+# Returning result with max test statistic
+res_rd <- rdtest::rdtest(Z = Z, vec_X = vec_X, bool_max_test = TRUE)
+summary(res_rd)
 }
