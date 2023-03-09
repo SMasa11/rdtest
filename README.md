@@ -6,7 +6,9 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/SMasa11/rdtest/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/SMasa11/rdtest/actions/workflows/R-CMD-check.yaml)
-<!-- badges: end --> *rdtest* offers a joint diagnostic procedure for
+<!-- badges: end --> 
+
+*rdtest* offers a joint diagnostic procedure for
 the testable restrictions of regression discontinuity (RD) designs. This
 package combines the existing packages of diagnostic testing (rddensity
 and rdrobust) to offer a set of joint test statistics to evaluate the
