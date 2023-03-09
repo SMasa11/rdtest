@@ -6,6 +6,8 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/SMasa11/rdtest/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/SMasa11/rdtest/actions/workflows/R-CMD-check.yaml)
+[![Codecov test
+coverage](https://codecov.io/gh/SMasa11/rdtest/branch/master/graph/badge.svg)](https://app.codecov.io/gh/SMasa11/rdtest?branch=master)
 <!-- badges: end --> *rdtest* offers a joint diagnostic procedure for
 the testable restrictions of regression discontinuity (RD) designs. This
 package combines the existing packages of diagnostic testing (rddensity
@@ -19,9 +21,9 @@ and 21K13269 (Sawada).
 ## Background
 
 The sufficient condition for identification in RD design, local
-randomization, has has two implications: continuous density function and
+randomization, has two implications: continuous density function and
 balancing of pre-treatment covariates. Violation of any of these
-testable restriction raises aa concern on the sufficient condition.
+testable restriction raises a concern on the sufficient condition.
 (Nevertheless, these testable restrictions are not directly related to
 identification itself. See [Ishihara and Sawada
 (2023)](https://arxiv.org/abs/2009.07551) for further details.)
@@ -156,8 +158,8 @@ ans <- summary(res_rd)
 
 In the above example, var5 has naive p-value of 0.026, but neither
 *sWald* test nor *max* test reject the joint null hypothesis of the
-whole 10 covariates and the density satisfy the continuity condition as
-designed.
+whole 10 covariates and the density satisfying the continuity condition
+as designed.
 
 ## Which tests should be used?
 
