@@ -18,7 +18,36 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/SMasa11/rdtest/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/SMasa11/rdtest/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
-The goal of rdtest is to ...
+*rdtest* offers a joint diagnostic procedure for the testable restrictions of
+regression discontinuity (RD) designs. This package combines the existing
+packages of diagnostic testing (rddensity and rdrobust) to offer a set of joint
+test statistics to evaluate the validity of a given RD design. The theoretical
+background of this package is provided in [Fusejima, Ishihara, and Sawada (2023,
+arXiv)](https://arxiv.org/abs/2205.04345). This work is supported by JSPS
+KAKENHI Grant Number JP20J20046 (Fusejima); JP20J00900 (Ishihara); and 21K13269
+(Sawada).
+
+## Background
+The sufficient condition for identification in RD design, local randomization,
+has has two implications: continuous density function and balancing of
+pre-treatment covariates. Violation of any of these testable restriction raises
+aa concern on the sufficient condition. (Nevertheless, these testable
+restrictions are not directly related to identification itself. See [Ishihara
+and Sawada (2023)](https://arxiv.org/abs/2009.07551) for further details.)
+
+Both testable restrictions are implemented in R packages, for example,
+[*rddensity*](https://rdpackages.github.io/rddensity/) for the former and
+[*rdrobust*](https://rdpackages.github.io/rdrobust/) for the latter. As pointed
+out in [Fusejima, et al. (2023)](https://arxiv.org/abs/2205.04345), however,
+multiple tests (median number of tests is 12) are run in practice without
+appropriate size control for the most of studies. Consequently, these RD
+practices suffer from massive size distortion due to *multiple testing problem*.
+Among 60 papers studied, 35\% of studies reject at least one of these testable
+restrictions; however, rejection of each test separately is approximately 5\%.
+Hence, the RD designs in these studies appear to maintain the null hypotheses;
+however, not a small fraction of studies contain false rejection of the null
+hypotheses more frequently than it should be. Our *rdtest* package is the
+resolution to this multiple testing problem.
 
 ## Installation
 
@@ -29,27 +58,60 @@ You can install the development version of rdtest from [GitHub](https://github.c
 devtools::install_github("SMasa11/rdtest")
 ```
 
-## Example
+## Usage
+*rdtest* package minimally expect a pair of variables:
 
-This is a basic example which shows you how to solve a common problem:
+- Z : a vector or a data.frame of pre-determined covariates whose conditional
+expectation should be continous at the cutoff under local randomization.
 
-```{r example}
+- vec_X: a vector of running variable.
+
+For example,
+```{r setup}
 library(rdtest)
-## basic example code
+set.seed(1)
+N <- 1000
+Z <- data.frame(var1 = rnorm(N),
+                var2 = rnorm(N),
+                var3 = rnorm(N),
+                var4 = rnorm(N),
+                var5 = rnorm(N),
+                var6 = rnorm(N),
+                var7 = rnorm(N),
+                var8 = rnorm(N),
+                var9 = rnorm(N),
+                var10 = rnorm(N))
+vec_X <- rnorm(N)
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
-
-```{r cars}
-summary(cars)
+In default, a version of Wald statistics (`sWald`, standardized Wald statistics.
+See [Fusejima, et al. (2023)](https://arxiv.org/abs/2205.04345) for its detail).
+```{r basic usage}
+res_rd <- rdtest::rdtest(Z = Z, vec_X = vec_X)
+ans <- summary(res_rd)
 ```
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this. You could also use GitHub Actions to re-render `README.Rmd` every time you push. An example workflow can be found here: <https://github.com/r-lib/actions/tree/v1/examples>.
-
-You can also embed plots, for example:
-
-```{r pressure, echo = FALSE}
-plot(pressure)
+With `bool_max_test` option TRUE, `rdtest` returns max test result instead of
+`sWald` test result.
+```{r other statistics}
+res_rd <- rdtest::rdtest(Z = Z, vec_X = vec_X, bool_max_test = TRUE)
+ans <- summary(res_rd)
 ```
+In the above example, var5 has naive p-value of 0.026, but neither *sWald* test
+nor *max* test reject the joint null hypothesis of the whole 10 covariates and
+the density satisfy the continuity condition as designed.
 
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
+## Which tests should be used?
+Based on our simulation exercises, we recommend the following rule-of-thumb:
+
+- *max* test is recommended when a researcher has a particularly concerning
+covariate among up to 5 covariates. For example, a proxy variable for the
+outcome or a placebo test may be of interest.
+
+- *sWald* test is recommended when a researcher has no prior concern on a
+specific covariate in violation of the continuity. In simulation, *sWald* test
+demonstrates a better performance than *max* test for 10 and 25 covariates in
+its size control.
+
+- Nevertheless, we recommend limiting one's focus on a fewer set of covariates
+(at most 10) for either tests.
