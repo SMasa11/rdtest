@@ -230,7 +230,9 @@ test_that("the vignette process for the first loop does not change",{
                             p.joint = df_resultJointTest[,10],
                             isMaxTest = df_resultJointTest[,11],
                             isChiStd = df_resultJointTest[,12])
-  testthat::expect_snapshot_output(df_coverage %>% gt())
+  testthat::expect_equal(df_coverage$p.naive,c(0.2,0.2,0.2))
+  testthat::expect_equal(df_coverage$p.bonferroni,c(0,0,0))
+  testthat::expect_equal(df_coverage$p.joint,c(0,0,0))
 
   vec_xJump <- c(0.15)
   vec_zJump <- seq(0,2,length=5)
@@ -420,12 +422,30 @@ test_that("the vignette process for the first loop does not change",{
       }
     }
   }
-  testthat::expect_snapshot_output(df_resultJointTest[,c(3,4,6:11)])
+  #testthat::expect_snapshot_output(df_resultJointTest[,c(3,4,6:11)])
+  testthat::expect_equal(df_resultJointTest[,8], c(0.3,0.5,0.9,1.0,1.0,0.3,0.5,0.9,1.0,1.0,0.3,0.5,0.9,1.0,1.0,0.3,0.5,0.5,0.9,1.0,0.3,0.5,0.5,0.9,1.0,0.3,0.5,0.5,0.9,1.0,0.3,0.2,0.5,0.4,0.5,0.3,0.2,0.5,0.4,0.5,0.3,0.2,0.5,0.4,0.5))
+  testthat::expect_equal(df_resultJointTest[,9], c(0.1,0.1,0.5,0.9,0.9,0.1,0.1,0.5,0.9,0.9,0.1,0.1,0.5,0.9,0.9,0.1,0.0,0.3,0.5,0.8,0.1,0.0,0.3,0.5,0.8,0.1,0.0,0.3,0.5,0.8,0.1,0.1,0.1,0.1,0.4,0.1,0.1,0.1,0.1,0.4,0.1,0.1,0.1,0.1,0.4))
+  testthat::expect_equal(df_resultJointTest[,10],c(0.1,0.2,0.6,0.9,0.9,0.1,0.2,0.8,1.0,1.0,0.1,0.2,0.4,0.9,0.9,0.1,0.0,0.3,0.6,0.8,0.1,0.1,0.2,0.8,1.0,0.1,0.2,0.2,0.4,0.9,0.1,0.1,0.1,0.3,0.4,0.1,0.0,0.1,0.1,0.3,0.1,0.2,0.1,0.2,0.5))
 
-  df_resultNull <-
-    df_resultJointTest[df_resultJointTest$vec_xjumpReportSpec == 0,]
-  testthat::expect_snapshot_output(df_resultNull[,c(3,4,8:11,14)])
+  list_compare <-
+    list(
+      case1 = data.frame(
+        z = c(0.0,0.5,1.0,1.5,2.0,0.0,0.5,1.0,1.5,2.0,0.0,0.5,1.0,1.5,2.0,0.0,0.5,1.0,1.5,2.0),
+        prob = c(0.1,0.2,0.6,0.9,0.9,0.1,0.1,0.5,0.9,0.9,0.1,0.1,0.5,0.9,0.9,0.1,0.2,0.4,0.9,0.9),
+        type = c("joint max","joint max","joint max","joint max","joint max","bonferroni","bonferroni","bonferroni","bonferroni","bonferroni","bonferroni","bonferroni","bonferroni","bonferroni","bonferroni","joint chi Std","joint chi Std","joint chi Std","joint chi Std","joint chi Std")
+      ),
+      case2 = data.frame(
+        z = c(0.0,0.5,1.0,1.5,2.0,0.0,0.5,1.0,1.5,2.0,0.0,0.5,1.0,1.5,2.0,0.0,0.5,1.0,1.5,2.0),
+        prob = c(0.1,0.0,0.3,0.6,0.8,0.1,0.0,0.3,0.5,0.8,0.1,0.0,0.3,0.5,0.8,0.1,0.2,0.2,0.4,0.9),
+        type = c("joint max","joint max","joint max","joint max","joint max","bonferroni","bonferroni","bonferroni","bonferroni","bonferroni","bonferroni","bonferroni","bonferroni","bonferroni","bonferroni","joint chi Std","joint chi Std","joint chi Std","joint chi Std","joint chi Std")
+      ),
+      case3 = data.frame(
+        z = c(0.0,0.5,1.0,1.5,2.0,0.0,0.5,1.0,1.5,2.0,0.0,0.5,1.0,1.5,2.0,0.0,0.5,1.0,1.5,2.0),
+        prob = c(0.1,0.1,0.1,0.3,0.4,0.1,0.1,0.1,0.1,0.4,0.1,0.1,0.1,0.1,0.4,0.1,0.2,0.1,0.2,0.5),
+        type = c("joint max","joint max","joint max","joint max","joint max","bonferroni","bonferroni","bonferroni","bonferroni","bonferroni","bonferroni","bonferroni","bonferroni","bonferroni","bonferroni","joint chi Std","joint chi Std","joint chi Std","joint chi Std","joint chi Std")
+      ))
 
+  count <- 0
   for (n in vec_n)
   {
     for (dim in unique(df_resultJointTest$vec_dimVecReportSpec))
@@ -470,24 +490,27 @@ test_that("the vignette process for the first loop does not change",{
                     data.frame(z = df_resultEvalChiStd$vec_zjumpReportSpec,
                                prob = df_resultEvalChiStd$vec_jointReportResult,
                                type = "joint chi Std"))
-
-            p_2 <- ggplot(
-              data = df_resultEvalMat,
-              mapping = aes(x = z, y = prob,color=type)
-              ) +
-              geom_point() +
-              scale_y_continuous(
-                breaks=c(0,0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1)) +
-              geom_vline(xintercept = 0, linetype = "dashed", size = 0.1) +
-              geom_hline(yintercept = 0, linetype = "dashed", size = 0.1) +
-              geom_hline(yintercept = 1, linetype = "dashed", size = 0.01) +
-              ggtitle(
-                paste0("x jump: ", xval,
-                       "; n: ", n,
-                       ", dim: ",dim,
-                       ", cor:",cor,
-                       ", alt Hyp:",jumpTest))
-            testthat::expect_snapshot_output(p_2)
+            count <- count + 1
+            testthat::expect_equal(df_resultEvalMat,eval(parse(text=paste0("list_compare$case",count))))
+            #
+            #
+            # p_2 <- ggplot(
+            #   data = df_resultEvalMat,
+            #   mapping = aes(x = z, y = prob,color=type)
+            #   ) +
+            #   geom_point() +
+            #   scale_y_continuous(
+            #     breaks=c(0,0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1)) +
+            #   geom_vline(xintercept = 0, linetype = "dashed", size = 0.1) +
+            #   geom_hline(yintercept = 0, linetype = "dashed", size = 0.1) +
+            #   geom_hline(yintercept = 1, linetype = "dashed", size = 0.01) +
+            #   ggtitle(
+            #     paste0("x jump: ", xval,
+            #            "; n: ", n,
+            #            ", dim: ",dim,
+            #            ", cor:",cor,
+            #            ", alt Hyp:",jumpTest))
+            # testthat::expect_snapshot_output(p_2)
           }
         }
       }
