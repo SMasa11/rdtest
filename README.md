@@ -6,6 +6,8 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/SMasa11/rdtest/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/SMasa11/rdtest/actions/workflows/R-CMD-check.yaml)
+[![Codecov test
+coverage](https://codecov.io/gh/SMasa11/rdtest/branch/master/graph/badge.svg)](https://app.codecov.io/gh/SMasa11/rdtest?branch=master)
 <!-- badges: end -->
 
 *rdtest* offers a joint diagnostic procedure for the testable
@@ -29,9 +31,13 @@ identification itself. See [Ishihara and Sawada
 (2023)](https://arxiv.org/abs/2009.07551) for further details.)
 
 Both testable restrictions are implemented in R packages, for example,
-[*rddensity*](https://rdpackages.github.io/rddensity/) for the former
-and [*rdrobust*](https://rdpackages.github.io/rdrobust/) for the latter.
-As pointed out in [Fusejima, et
+[*rddensity*](https://rdpackages.github.io/rddensity/) ([Calonico,
+Cattaneo, and Titiunik
+(2014)](https://onlinelibrary.wiley.com/doi/10.3982/ECTA11757)) for the
+former and [*rdrobust*](https://rdpackages.github.io/rdrobust/)
+([Cattaneo, Jansson, and Ma
+(2020)](https://www.tandfonline.com/doi/abs/10.1080/01621459.2019.1635480))
+for the latter. As pointed out in [Fusejima, et
 al. (2023)](https://arxiv.org/abs/2205.04345), however, multiple tests
 (median number of tests is 12) are run in practice without appropriate
 size control for the most of studies. Consequently, these RD practices
