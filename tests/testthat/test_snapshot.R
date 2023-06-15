@@ -1065,3 +1065,182 @@ test_that("the vignette process for the first loop does not change, dim = 1, alt
     }
   }
 })
+
+test_that("the summary returns the expected display, covariates",{
+  set.seed(1)
+  N <- 1000
+  Z <- data.frame(var1 = rnorm(N),
+                  var2 = rnorm(N),
+                  var3 = rnorm(N),
+                  var4 = rnorm(N),
+                  var5 = rnorm(N))
+  vec_X <- rnorm(N)
+  res_rd <- rdtest::rdtest(Z = Z, vec_X = vec_X, bool_joint = FALSE)
+  ans <- summary(res_rd)
+
+  tstats <- matrix(NA, 0L, 3L,
+                   dimnames = list(NULL,
+                                   c("Variable",
+                                     "t-stat",
+                                     "(Naive) p-value")))
+  tstats <-
+    rbind(tstats,
+          cbind(Variable = "var1",
+                `t-stat` = -0.182,
+                `(Naive) p-value` = 0.428))
+  tstats <-
+    rbind(tstats,
+          cbind(Variable = "var2",
+                `t-stat` = 0.125,
+                `(Naive) p-value` = 0.45))
+  tstats <-
+    rbind(tstats,
+          cbind(Variable = "var3",
+                `t-stat` = 0.403,
+                `(Naive) p-value` = 0.343))
+  tstats <-
+    rbind(tstats,
+          cbind(Variable = "var4",
+                `t-stat` = 1.53,
+                `(Naive) p-value` = 0.063))
+  tstats <-
+    rbind(tstats,
+          cbind(Variable = "var5",
+                `t-stat` = -0.301,
+                `(Naive) p-value` = 0.382))
+  expect_equal(ans$tstats,tstats)
+})
+
+test_that("the summary returns the expected display, stdWald",{
+  set.seed(1)
+  N <- 1000
+  Z <- data.frame(var1 = rnorm(N),
+                  var2 = rnorm(N),
+                  var3 = rnorm(N),
+                  var4 = rnorm(N),
+                  var5 = rnorm(N))
+  vec_X <- rnorm(N)
+  res_rd <- rdtest::rdtest(Z = Z, vec_X = vec_X)
+  ans <- summary(res_rd)
+
+  tstats <- matrix(NA, 0L, 3L,
+                         dimnames = list(NULL,
+                                           c("Variable",
+                                               "t-stat",
+                                               "(Naive) p-value")))
+  tstats <-
+    rbind(tstats,
+          cbind(Variable = "density",
+                `t-stat` = -0.303,
+                `(Naive) p-value` = 0.381))
+  tstats <-
+    rbind(tstats,
+          cbind(Variable = "var1",
+                `t-stat` = -0.182,
+                `(Naive) p-value` = 0.428))
+  tstats <-
+    rbind(tstats,
+          cbind(Variable = "var2",
+                `t-stat` = 0.125,
+                `(Naive) p-value` = 0.45))
+  tstats <-
+    rbind(tstats,
+          cbind(Variable = "var3",
+                `t-stat` = 0.403,
+                `(Naive) p-value` = 0.343))
+  tstats <-
+    rbind(tstats,
+          cbind(Variable = "var4",
+                `t-stat` = 1.53,
+                `(Naive) p-value` = 0.063))
+  tstats <-
+    rbind(tstats,
+          cbind(Variable = "var5",
+                `t-stat` = -0.301,
+                `(Naive) p-value` = 0.382))
+  expect_equal(ans$tstats,tstats)
+
+  joint_result <- matrix(NA, 0L, 4L,
+                             dimnames = list(NULL,
+                                             c("Test Type",
+                                               "Test Statistic",
+                                               "Critical Value",
+                                               "Joint p-value")))
+
+  test_type = "standardized Wald test"
+  crit_value <- 12.825
+  names(crit_value) <- "95%"
+  joint_result <-
+    rbind(joint_result,
+          cbind(
+            `Test Type` = test_type,
+            `Test Statistic` = 2.737,
+            `Critical Value` = crit_value,
+            `Joint p-alue` = 0.834
+          ))
+  expect_equal(knitr::kable(ans$joint_result,"rst"),knitr::kable(joint_result,"rst"))
+})
+test_that("the summary returns the expected display, max",{
+  set.seed(1)
+  N <- 1000
+  Z <- data.frame(var1 = rnorm(N),
+                  var2 = rnorm(N),
+                  var3 = rnorm(N),
+                  var4 = rnorm(N),
+                  var5 = rnorm(N))
+  vec_X <- rnorm(N)
+  res_rd <- rdtest::rdtest(Z = Z, vec_X = vec_X,bool_max_test = TRUE)
+  ans <- summary(res_rd)
+
+  joint_result <- matrix(NA, 0L, 4L,
+                         dimnames = list(NULL,
+                                         c("Test Type",
+                                           "Test Statistic",
+                                           "Critical Value",
+                                           "Joint p-value")))
+
+  test_type = "Max test"
+  crit_value <- 6.794
+  names(crit_value) <- "95%"
+  joint_result <-
+    rbind(joint_result,
+          cbind(
+            `Test Type` = test_type,
+            `Test Statistic` = 2.344,
+            `Critical Value` = crit_value,
+            `Joint p-alue` = 0.535
+          ))
+  expect_equal(knitr::kable(ans$joint_result,"rst"),knitr::kable(joint_result,"rst"))
+})
+
+test_that("the summary returns the expected display, naive Wald",{
+  set.seed(1)
+  N <- 1000
+  Z <- data.frame(var1 = rnorm(N),
+                  var2 = rnorm(N),
+                  var3 = rnorm(N),
+                  var4 = rnorm(N),
+                  var5 = rnorm(N))
+  vec_X <- rnorm(N)
+  res_rd <- rdtest::rdtest(Z = Z, vec_X = vec_X,bool_L2_std = FALSE,bool_max_test = FALSE)
+  ans <- summary(res_rd)
+
+  joint_result <- matrix(NA, 0L, 4L,
+                         dimnames = list(NULL,
+                                         c("Test Type",
+                                           "Test Statistic",
+                                           "Critical Value",
+                                           "Joint p-value")))
+
+  test_type = "(non-standardized) Wald test"
+  crit_value <- 12.592
+  joint_result <-
+    rbind(joint_result,
+          cbind(
+            `Test Type` = test_type,
+            `Test Statistic` = 2.805,
+            `Critical Value` = crit_value,
+            `Joint p-alue` = 0.833
+          ))
+  expect_equal(knitr::kable(ans$joint_result,"rst"),knitr::kable(joint_result,"rst"))
+})
