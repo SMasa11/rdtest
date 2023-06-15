@@ -1066,6 +1066,236 @@ test_that("the vignette process for the first loop does not change, dim = 1, alt
   }
 })
 
+test_that("the vignette process for the first loop does not change, dim = 3, negative corr",{
+
+  int_ns <- 10
+
+  fun_runnerJoint = function(str_spec)
+  {
+    #tic(str_spec)
+    time_start <- Sys.time()
+    eval(parse(
+      text = paste0(
+        paste0("list_summary <- return_result_MC_joint(",str_spec),")"
+      )))
+    time_end <- Sys.time()
+    #toc()
+    return(list_summary)
+  }
+
+  # Specification list
+  # values for x jumps
+  vec_xJump <- c(0) #,0.15,0.3)
+  # values for z jumps
+  vec_zJump <- c(0) #seq(0,2,length=5)
+  # sample sizes
+  vec_n <- c(500)
+  vec_covZ <- c(-0.5)
+  vec_dimZ <- c(3)
+  # the last one, half, full:
+  ## half: for 3, 2:3 jumps.
+  vec_frac_jump <- list("'None'")
+
+  int_numberSpec <-
+    length(vec_xJump) *
+    length(vec_n) *
+    length(vec_zJump) *
+    length(vec_covZ) *
+    length(vec_dimZ) *
+    length(vec_frac_jump)
+
+  vec_effNzReportSpec <- c(1:int_numberSpec)
+  vec_effNxReportSpec <- c(1:int_numberSpec)
+  vec_corZReportSpec <- c(1:int_numberSpec)
+  vec_dimVecReportSpec <- c(1:int_numberSpec)
+  vec_nReportSpec <- c(1:int_numberSpec)
+  vec_xjumpReportSpec <- c(1:int_numberSpec)
+  vec_zjumpReportSpec <- c(1:int_numberSpec)
+  vec_naiveReportResult <- c(1:int_numberSpec)
+  vec_bonfeReportResult <- c(1:int_numberSpec)
+  vec_jointReportResult <- c(1:int_numberSpec)
+  vec_maxTestSpec <- c(1:int_numberSpec)
+  vec_avgMaxTestCritical <- c(1:int_numberSpec)
+  vec_medianMaxTestCritical <- c(1:int_numberSpec)
+  vec_jumpTestSpec <- c(1:int_numberSpec)
+
+  list_speclist <- list()
+
+  counter <- 1
+  df_resultJointTest <- data.frame()
+  fun_repeaterJoint <- function(n,
+                                cov_z,
+                                dim,
+                                x_jump,
+                                z_jump,
+                                bool_max_test,
+                                bool_L2_std = FALSE,
+                                counter,
+                                df_resultJointTest,
+                                frac_jump,
+                                spec) {
+    list_sum <- fun_runnerJoint(str_spec=spec)
+
+    real_effNzReportSpec <- round(list_sum$effN.mean,1)
+    real_effNxReportSpec <- round(list_sum$effNx.mean,1)
+    real_corZReportSpec <- round(list_sum$cor.z,2)
+    real_dimVecReportSpec <- dim
+    real_nReportSpec <- n
+    real_xjumpReportSpec <- x_jump
+    real_zjumpReportSpec <- z_jump
+
+    real_naiveReportResult <- round(list_sum$naive,3)
+    real_bonfeReportResult <- round(list_sum$bonfe,3)
+    real_jointReportResult <- round(list_sum$joint,3)
+    real_maxTestSpec <- bool_max_test
+    if (bool_max_test) {
+      real_avgMaxTestCritical <- round(mean(list_sum$maxCritical),3)
+      real_medianMaxTestCritical <- round(median(list_sum$maxCritical),3)
+    } else {
+      real_avgMaxTestCritical <- NA
+      real_medianMaxTestCritical <- NA
+    }
+
+    list_speclist[counter] <- spec
+    #print(spec)
+
+    df_resultJointTest <-
+      rbind(df_resultJointTest,
+            data.frame(vec_effNzReportSpec = real_effNzReportSpec,
+                       vec_effNxReportSpec = real_effNxReportSpec,
+                       vec_corZReportSpec = cov_z,
+                       vec_dimVecReportSpec = real_dimVecReportSpec,
+                       vec_nReportSpec = real_nReportSpec,
+                       vec_xjumpReportSpec = real_xjumpReportSpec,
+                       vec_zjumpReportSpec = real_zjumpReportSpec,
+                       vec_naiveReportResult = real_naiveReportResult,
+                       vec_bonfeReportResult = real_bonfeReportResult,
+                       vec_jointReportResult = real_jointReportResult,
+                       vec_maxTestSpec = real_maxTestSpec,
+                       vec_L2_std = bool_L2_std,
+                       vec_avgMaxTestCritical = real_avgMaxTestCritical,
+                       vec_medianMaxTestCritical = real_medianMaxTestCritical,
+                       vec_jumpTestSpec = frac_jump))
+    return(df_resultJointTest)
+  }
+
+  for (n in vec_n) {
+    for (dim in vec_dimZ) {
+      if (dim == 1) {
+        vec_covZUsed <- c(0)
+      } else {
+        vec_covZUsed <- vec_covZ
+      }
+      for (cov_z in vec_covZUsed) {
+        for (frac_jump in vec_frac_jump) {
+          cat("Running for n=",n,
+              ",dim=",dim,
+              ",cov_z=",cov_z,
+              ",frac=", frac_jump,".\n")
+          # bool_maxTest TRUE
+          for (x_jump in vec_xJump) {
+            for (z_jump in vec_zJump) {
+              if ((x_jump > 0.000001) | (x_jump == 0 & z_jump == 0)) {
+                spec <- paste0("int_ns=",int_ns,
+                               ",a_2=",0,
+                               ",x_jump=",x_jump,
+                               ",jump=",z_jump,
+                               ",dim=",dim,
+                               ",n=",n,
+                               ",cov_z =", cov_z,
+                               ",frac_jump=",frac_jump,
+                               ",bool_mutePrint=TRUE,bool_max_test=",TRUE)
+                df_resultJointTest <-
+                  fun_repeaterJoint(n = n,
+                                    cov_z = cov_z,
+                                    dim = dim,
+                                    x_jump = x_jump,
+                                    z_jump = z_jump,
+                                    bool_max_test = TRUE,
+                                    counter = counter,
+                                    df_resultJointTest = df_resultJointTest,
+                                    frac_jump = frac_jump,
+                                    spec = spec)
+                counter <- counter + 1
+              }
+            }
+          }
+          # bool_maxTest FALSE
+          for (x_jump in vec_xJump) {
+            for (z_jump in vec_zJump) {
+              if ((x_jump > 0.000001) | (x_jump == 0 & z_jump == 0)) {
+                spec <- paste0("int_ns=",int_ns,
+                               ",a_2=",0,
+                               ",x_jump=",x_jump,
+                               ",jump=",z_jump,
+                               ",dim=",dim,
+                               ",n=",n,
+                               ",cov_z =", cov_z,
+                               ",frac_jump=",frac_jump,
+                               ",bool_mutePrint=TRUE,bool_max_test=",FALSE)
+                df_resultJointTest <-
+                  fun_repeaterJoint(n = n,
+                                    cov_z = cov_z,
+                                    dim = dim,
+                                    x_jump = x_jump,
+                                    z_jump = z_jump,
+                                    bool_max_test = FALSE,
+                                    counter = counter,
+                                    df_resultJointTest = df_resultJointTest,
+                                    frac_jump = frac_jump,
+                                    spec = spec)
+                counter <- counter + 1
+              }
+            }
+          }
+          # bool_maxTest FALSE, bool_L2_std TRUE
+          for (x_jump in vec_xJump) {
+            for (z_jump in vec_zJump) {
+              if ((x_jump > 0.000001) | (x_jump == 0 & z_jump == 0)) {
+                spec <- paste0("int_ns=",int_ns,
+                               ",a_2=",0,
+                               ",x_jump=",x_jump,
+                               ",jump=",z_jump,
+                               ",dim=",dim,
+                               ",n=",n,
+                               ",cov_z =", cov_z,
+                               ",frac_jump=",frac_jump,
+                               ",bool_mutePrint=TRUE,bool_max_test=",FALSE,
+                               ",bool_L2_std=",TRUE)
+                df_resultJointTest <-
+                  fun_repeaterJoint(n = n,
+                                    cov_z = cov_z,
+                                    dim = dim,
+                                    x_jump = x_jump,
+                                    z_jump = z_jump,
+                                    bool_max_test = FALSE,
+                                    counter = counter,
+                                    df_resultJointTest = df_resultJointTest,
+                                    frac_jump = frac_jump,
+                                    spec = spec,
+                                    bool_L2_std=TRUE)
+                counter <- counter + 1
+              }
+            }
+          }
+        }
+      }
+
+    }
+  }
+  df_coverage <- data.frame(n = df_resultJointTest[,5],
+                            cov = df_resultJointTest[,3],
+                            dim = df_resultJointTest[,4],
+                            p.naive = df_resultJointTest[,8],
+                            p.bonferroni = df_resultJointTest[,9],
+                            p.joint = df_resultJointTest[,10],
+                            isMaxTest = df_resultJointTest[,11],
+                            isChiStd = df_resultJointTest[,12])
+  testthat::expect_equal(df_coverage$p.naive,c(0.1,0.1,0.1))
+  testthat::expect_equal(df_coverage$p.bonferroni,c(0,0,0))
+  testthat::expect_equal(df_coverage$p.joint,c(0,0,0))
+})
+
 test_that("the summary returns the expected display, covariates",{
   set.seed(1)
   N <- 1000
