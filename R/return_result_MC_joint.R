@@ -40,15 +40,15 @@ return_result_MC_joint <- function(int_ns = 300,
 {
   set.seed(52622)
 
-  if (jump != 0)
-  {
-    if (frac_jump == 0)
-    {
-      warning(
-        "WARNING:
-        JUMP IS SPECIFIED BUT NOT APPLIED AS frac.jump IS NOT SPECIFIED.")
-    }
-  }
+  # if (jump != 0)
+  # {
+  #   if (frac_jump == 0)
+  #   {
+  #     warning(
+  #       "WARNING:
+  #       JUMP IS SPECIFIED BUT NOT APPLIED AS frac.jump IS NOT SPECIFIED.")
+  #   }
+  # }
 
   ns <- int_ns
   naive.num.reject <- 0
@@ -128,36 +128,39 @@ return_result_MC_joint <- function(int_ns = 300,
 
     vec.criticalValue[loop] <- list_result_joint$real_critical_value_joint
 
-    if (loop %% 100 == 0)
-    {
-      if (!bool_mutePrint) {message(loop)}
-    }
+    # for development debugging
+    # if (loop %% 100 == 0)
+    # {
+    #   if (!bool_mutePrint) {message(loop)}
+    # }
   }
-  if (!bool_mutePrint) {
-    print("average effective sample size")
-    print(mean(effN.z.vec))
 
-    print("average correlation of Z1 and Z2")
-    print(mean(covZ1Z2.vec))
-
-    print("mean z stat")
-    print(mean(mean.jump.z.vec))
-
-    print("median z stat")
-    print(mean(median.jump.z.vec))
-
-    print("max z stat")
-    print(mean(max.jump.z.vec))
-
-
-    print("naive rejection rate")
-    print(naive.num.reject/ns)
-    print("bonferroni rejection rate")
-    print(bonfe.num.reject/ns)
-    print("joint rejection rate")
-    if (bool_max_test == FALSE) {joint.num.reject <- joint.num.reject[1,1]}
-    print(joint.num.reject/ns)
-  }
+  # for development debugging
+  # if (!bool_mutePrint) {
+  #   print("average effective sample size")
+  #   print(mean(effN.z.vec))
+  #
+  #   print("average correlation of Z1 and Z2")
+  #   print(mean(covZ1Z2.vec))
+  #
+  #   print("mean z stat")
+  #   print(mean(mean.jump.z.vec))
+  #
+  #   print("median z stat")
+  #   print(mean(median.jump.z.vec))
+  #
+  #   print("max z stat")
+  #   print(mean(max.jump.z.vec))
+  #
+  #
+  #   print("naive rejection rate")
+  #   print(naive.num.reject/ns)
+  #   print("bonferroni rejection rate")
+  #   print(bonfe.num.reject/ns)
+  #   print("joint rejection rate")
+  #   if (bool_max_test == FALSE) {joint.num.reject <- joint.num.reject[1,1]}
+  #   print(joint.num.reject/ns)
+  # }
 
   summary <- list(vec.statMaxJoint = vec.statMaxJoint,
                   chi.stat.vec = chi.stat.vec,

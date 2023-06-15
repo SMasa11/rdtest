@@ -9,10 +9,10 @@ simulate_DGP = function(list_option)
   # Reading options ----
   list_parameter <- load_option_simulation(list_option)
 
-  if ((list_parameter$int_DGP != 1) &
-      (list_parameter$int_DGP != 2) &
-      (list_parameter$int_DGP != 3))
-    {stop("Currently DGP specifications are either 1, 2 or 3.")}
+  # if ((list_parameter$int_DGP != 1) &
+  #     (list_parameter$int_DGP != 2) &
+  #     (list_parameter$int_DGP != 3))
+  #   {stop("Currently DGP specifications are either 1, 2 or 3.")}
 
   # THESE DGPs are not used.
   # # DGP1
@@ -204,8 +204,9 @@ simulate_DGP = function(list_option)
       vec_a[length(vec_a)] <- list_parameter$real_a_param
       bool_frac_eval_flag <- TRUE
     }
-    if (bool_frac_eval_flag == FALSE) {
-      stop("str_frac_jump_Z is taking an undefined value.")}
+    # for development debugging
+    # if (bool_frac_eval_flag == FALSE) {
+    #   stop("str_frac_jump_Z is taking an undefined value.")}
 
     mat_A <- t(matrix(rep(vec_a,list_parameter$int_n),
                       list_parameter$int_dim_Z,
