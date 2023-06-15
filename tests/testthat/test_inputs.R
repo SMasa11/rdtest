@@ -54,5 +54,3 @@ testthat::test_that("bool_joint is boolean", {
                                         bool_joint = 2),
                          regexp = "bool_joint need to be either 0 or 1")
 })
-
-

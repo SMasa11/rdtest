@@ -11,7 +11,6 @@ rdtest(
   int_J = 3,
   real_cutoff = 0,
   bool_max_test = FALSE,
-  bool_max_test_V_inv = FALSE,
   bool_L2_std = TRUE
 )
 }
@@ -30,8 +29,6 @@ estimation, default is 3.}
 
 \item{bool_max_test}{Boolean, use of max test, instead of Wald tests, default
 is FALSE.}
-
-\item{bool_max_test_V_inv}{Boolean, an option not used anymore, set to FALSE.}
 
 \item{bool_L2_std}{Boolean, use of standardized Wald test, default is TRUE.}
 }

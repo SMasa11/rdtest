@@ -9,7 +9,6 @@ compute_test_stat(
   int_dim_Z,
   int_J = 3,
   bool_max_test = FALSE,
-  bool_max_test_V_inv = FALSE,
   bool_L2_std = FALSE,
   bool_joint = TRUE
 )
@@ -24,8 +23,6 @@ default is 3.}
 
 \item{bool_max_test}{Boolean, use max test instead of L2 test,
 default is false.}
-
-\item{bool_max_test_V_inv}{Boolean, option for using inverse V for max test.}
 
 \item{bool_L2_std}{Boolean, for using standardized t stat for L2 test.}
 

@@ -14,7 +14,6 @@
 #' @param bool_L2_std Boolean, use of standardized Wald test, default is TRUE.
 #' @param bool_max_test Boolean, use of max test, instead of Wald tests, default
 #'   is FALSE.
-#' @param bool_max_test_V_inv Boolean, an option not used anymore, set to FALSE.
 #'
 #' @examples
 #' # Prepare a mock dataset
@@ -43,7 +42,6 @@ rdtest <- function(Z,
                    int_J = 3,
                    real_cutoff = 0,
                    bool_max_test = FALSE,
-                   bool_max_test_V_inv = FALSE,
                    bool_L2_std = TRUE)
 {
 
@@ -103,7 +101,6 @@ rdtest <- function(Z,
     int_dim_Z = int_dim_Z,
     int_J = int_J,
     bool_max_test = bool_max_test,
-    bool_max_test_V_inv = FALSE,
     bool_L2_std = bool_L2_std,
     bool_joint = bool_joint)
   list_result$call <- match.call()

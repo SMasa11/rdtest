@@ -7,7 +7,6 @@
 #'  default is 3.
 #' @param bool_max_test Boolean, use max test instead of L2 test,
 #'  default is false.
-#' @param bool_max_test_V_inv Boolean, option for using inverse V for max test.
 #' @param bool_L2_std Boolean, for using standardized t stat for L2 test.
 #' @param bool_joint Boolean, for returning joint test, instead of balance only.
 ####
@@ -16,7 +15,6 @@ return_result_joint <- function(df_data,
                                int_dim_Z,
                                int_J = 3,
                                bool_max_test = FALSE,
-                               bool_max_test_V_inv = FALSE,
                                bool_L2_std = TRUE,
                                bool_joint = TRUE)
 {
@@ -29,8 +27,7 @@ return_result_joint <- function(df_data,
                     bool_joint = TRUE,
                     int_J = int_J,
                     bool_L2_std = bool_L2_std,
-                    bool_max_test = bool_max_test,
-                    bool_max_test_V_inv = bool_max_test_V_inv)
+                    bool_max_test = bool_max_test)
 
   bool_reject_naive_null <-
     list_result_covariate$bool_reject_naive_null
@@ -105,43 +102,27 @@ return_result_joint <- function(df_data,
       }
     }
   } else {
-    if (bool_max_test_V_inv == TRUE) {
-      if (bool_joint) {
-        # standardized max stats
-        real_stat_max_joint <-
-          max(list_result_covariate$real_stat,real_tstat_X^2)
-      } else {
-        # standardized max stats
-        real_stat_max_joint <-
-          max(list_result_covariate$real_stat)
-      }
-      bool_reject_joint_null <-
-        (real_stat_max_joint >= stats::qchisq(0.95^(1/int_dim_total),1))
-      real_critical_value_joint <- stats::qchisq(0.95^(1/int_dim_total),1)
-      real_stat_joint <- real_stat_max_joint
-    } else {
-      real_stat_max_joint <-
-        max(list_result_covariate$real_stat,real_tstat_X^2)
-      vec_random_draw_stat <- rep(0,int_num_simul_draw)
-      mat_cor <- matrix(rep(0,(int_dim_total)^2),int_dim_total,int_dim_total)
-      mat_cor[1:int_dim_Z,1:int_dim_Z] <- list_result_covariate$mat_cor
-      if (bool_joint) {
-        mat_cor[int_dim_total,int_dim_total] <- 1
-      }
-      mat_random_draw_stat <-
-        return_random_stat(int_num_simul = int_num_simul_draw,
-                           int_dim = int_dim_total,
-                           mat_cor = mat_cor)
-      for (l in seq(1:int_num_simul_draw)) {
-        # Replicating the (signed) vector of statistics
-        # by multiplying the corr matrix, then take square and max.
-        vec_random_draw_stat[l] <- max(mat_random_draw_stat[,l]^2)
-      }
-      real_stat_joint <- real_stat_max_joint
-      real_pvalue <- mean((vec_random_draw_stat >= real_stat_max_joint))
-      bool_reject_joint_null <- (real_pvalue <= 0.05)
-      real_critical_value_joint <- stats::quantile(vec_random_draw_stat,0.95)
+    real_stat_max_joint <-
+      max(list_result_covariate$real_stat,real_tstat_X^2)
+    vec_random_draw_stat <- rep(0,int_num_simul_draw)
+    mat_cor <- matrix(rep(0,(int_dim_total)^2),int_dim_total,int_dim_total)
+    mat_cor[1:int_dim_Z,1:int_dim_Z] <- list_result_covariate$mat_cor
+    if (bool_joint) {
+      mat_cor[int_dim_total,int_dim_total] <- 1
     }
+    mat_random_draw_stat <-
+      return_random_stat(int_num_simul = int_num_simul_draw,
+                         int_dim = int_dim_total,
+                         mat_cor = mat_cor)
+    for (l in seq(1:int_num_simul_draw)) {
+      # Replicating the (signed) vector of statistics
+      # by multiplying the corr matrix, then take square and max.
+      vec_random_draw_stat[l] <- max(mat_random_draw_stat[,l]^2)
+    }
+    real_stat_joint <- real_stat_max_joint
+    real_pvalue <- mean((vec_random_draw_stat >= real_stat_max_joint))
+    bool_reject_joint_null <- (real_pvalue <= 0.05)
+    real_critical_value_joint <- stats::quantile(vec_random_draw_stat,0.95)
   }
 
 

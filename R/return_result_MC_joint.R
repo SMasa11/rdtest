@@ -18,7 +18,6 @@
 #'  default is 3.
 #' @param bool_max_test Boolean, use max test instead of L2 test,
 #'  default is false.
-#' @param bool_max_test_V_inv Boolean, option for using inverse V for max test.
 #' @param bool_L2_std Boolean, for using standardized t stat for L2 test.
 #'
 #' @export
@@ -35,7 +34,6 @@ return_result_MC_joint <- function(int_ns = 300,
                                      bool_mutePrint = FALSE,
                                      int_J = 3,
                                      bool_max_test = FALSE,
-                                     bool_max_test_V_inv = FALSE,
                                      bool_L2_std = FALSE)
 {
   set.seed(52622)
@@ -92,7 +90,6 @@ return_result_MC_joint <- function(int_ns = 300,
                                   int_J = int_J,
                                   real_cutoff = 0,
                                   bool_max_test = bool_max_test,
-                                  bool_max_test_V_inv = bool_max_test_V_inv,
                                   bool_L2_std = bool_L2_std)
     } else {
       list_result_joint <- rdtest(Z = data[,1:option$int_dim_Z],
@@ -101,7 +98,6 @@ return_result_MC_joint <- function(int_ns = 300,
                                   int_J = int_J,
                                   real_cutoff = 0,
                                   bool_max_test = bool_max_test,
-                                  bool_max_test_V_inv = bool_max_test_V_inv,
                                   bool_L2_std = bool_L2_std)
     }
 

@@ -8,7 +8,6 @@ compute_test_stat <- function(df_data,
                             int_dim_Z,
                             int_J = 3,
                             bool_max_test = FALSE,
-                            bool_max_test_V_inv = FALSE,
                             bool_L2_std = FALSE,
                             bool_joint = TRUE)
 {
@@ -261,17 +260,7 @@ compute_test_stat <- function(df_data,
       vec_tstat_Z[l] <-
         vec_tstat_Z[l] * vec_se_Z[l] * (vec_h_L[l]^(1/2))/sqrt(mat_cov[l,l])
     }
-    if (bool_max_test_V_inv) {
-      U <- svd(mat_cor)$u
-      V <- svd(mat_cor)$v
-      D2_inv <- sqrt(chol2inv(chol(diag(sqrt(svd(mat_cor)$d)))))
-      mat_cor_sqrt_inv <- U %*% D2_inv %*% t(V)
-      # take it to the identity matrix
-      mat_cor <- diag(int_dim_Z)
-      real_stat <- max((mat_cor_sqrt_inv %*% vec_tstat_Z)^2)
-    } else {
-      real_stat <- max(vec_tstat_Z^2)
-    }
+    real_stat <- max(vec_tstat_Z^2)
   } else {
     ## Why are we multiplying the bandwidth here?
     # because we are allowing for different bands by l,
