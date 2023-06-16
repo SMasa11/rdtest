@@ -1,12 +1,12 @@
-####
 #'
 #' return_random_stat
+#'
+#' an internal function for critical value computation
 #'
 #' @param int_num_simul Integer, number of simulation draws.
 #' @param int_dim Integer, dimension to generate the draws.
 #' @param mat_cor Matrix, correlation matrix of the target random variable.
 #'
-####
 
 return_random_stat <- function(int_num_simul,
                                int_dim,

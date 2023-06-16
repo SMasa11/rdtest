@@ -1,8 +1,6 @@
-####
 #' Return statistics for covariates balance or placebo test.
 #'
 #' @inherit return_result_joint
-####
 
 compute_test_stat <- function(df_data,
                             int_dim_Z,

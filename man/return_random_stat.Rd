@@ -14,5 +14,5 @@ return_random_stat(int_num_simul, int_dim, mat_cor)
 \item{mat_cor}{Matrix, correlation matrix of the target random variable.}
 }
 \description{
-return_random_stat
+an internal function for critical value computation
 }

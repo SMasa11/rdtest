@@ -1,4 +1,3 @@
-####
 #' return joint test result
 #'
 #' @param df_data Data.frame, data to evaluate.
@@ -9,7 +8,6 @@
 #'  default is false.
 #' @param bool_L2_std Boolean, for using standardized t stat for L2 test.
 #' @param bool_joint Boolean, for returning joint test, instead of balance only.
-####
 
 return_result_joint <- function(df_data,
                                int_dim_Z,

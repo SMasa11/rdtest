@@ -1,10 +1,8 @@
-####
 #' Option loaders for simulations
 #'
 #' Loading options for simulations tuned up for specified DGPs
 #'
 #' @param list_option list
-####
 
 load_option_simulation = function(list_option)
 {

@@ -29,10 +29,10 @@
 #'  vec_X <- rnorm(N)
 #' # Returning result with sWald test statistic
 #' res_rd <- rdtest::rdtest(Z = Z, vec_X = vec_X)
-#' summary(res_rd)
+#' ans <- summary(res_rd)
 #' # Returning result with max test statistic
 #' res_rd <- rdtest::rdtest(Z = Z, vec_X = vec_X, bool_max_test = TRUE)
-#' summary(res_rd)
+#' ans <- summary(res_rd)
 #' @export
 #'
 

@@ -1,4 +1,3 @@
-####
 #' MC joint test of coverage / power check using simulated data
 #'
 #' Example code for simulation excercise
@@ -21,7 +20,6 @@
 #' @param bool_L2_std Boolean, for using standardized t stat for L2 test.
 #'
 #' @export
-####
 
 return_result_MC_joint <- function(int_ns = 300,
                                      x_jump,
