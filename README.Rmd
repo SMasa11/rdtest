@@ -31,8 +31,8 @@ KAKENHI Grant Number JP20J20046 (Fusejima); JP20J00900 (Ishihara); and 21K13269
 ## Background
 The sufficient condition for identification in RD design, local randomization,
 has two implications: continuous density function and balancing of
-pre-treatment covariates. Violation of any of these testable restriction raises
-a concern on the sufficient condition. (Nevertheless, these testable
+pre-treatment covariates. Violation of any of these testable restrictions raises
+a concern about the sufficient condition. (Nevertheless, these testable
 restrictions are not directly related to identification itself. See [Ishihara
 and Sawada (2023)](https://arxiv.org/abs/2009.07551) for further details.)
 
@@ -40,13 +40,13 @@ Both testable restrictions are implemented in R packages, for example,
 [*rddensity*](https://rdpackages.github.io/rddensity/) ([Calonico, Cattaneo, and Titiunik (2014)](https://onlinelibrary.wiley.com/doi/10.3982/ECTA11757)) for the former and [*rdrobust*](https://rdpackages.github.io/rdrobust/) ([Cattaneo, Jansson, and Ma (2020)](https://www.tandfonline.com/doi/abs/10.1080/01621459.2019.1635480)) for the latter. As pointed
 out in [Fusejima, et al. (2023)](https://arxiv.org/abs/2205.04345), however,
 multiple tests (median number of tests is 12) are run in practice without
-appropriate size control for the most of studies. Consequently, these RD
+appropriate size control for most of the studies. Consequently, these RD
 practices suffer from massive size distortion due to *multiple testing problem*.
 Among 60 papers studied, 35\% of studies reject at least one of these testable
-restrictions; however, rejection of each test separately is approximately 5\%.
+restrictions; however, the rejection of each test separately is approximately 5\%.
 Hence, the RD designs in these studies appear to maintain the null hypotheses;
-however, not a small fraction of studies contain false rejection of the null
-hypotheses more frequently than it should be. Our *rdtest* package is the
+however, not a small fraction of studies contain false rejections of the null
+hypotheses more frequently than they should be. Our *rdtest* package is the
 resolution to this multiple testing problem.
 
 ## Installation
@@ -59,7 +59,7 @@ devtools::install_github("SMasa11/rdtest")
 ```
 
 ## Usage
-*rdtest* package minimally expect a pair of variables:
+*rdtest* package minimally expects a pair of variables:
 
 - Z : a vector or a data.frame of pre-determined covariates whose conditional
 expectation should be continous at the cutoff under local randomization.
@@ -85,7 +85,7 @@ vec_X <- rnorm(N)
 ```
 
 In default, a version of Wald statistics (`sWald`, standardized Wald statistics.
-See [Fusejima, et al. (2023)](https://arxiv.org/abs/2205.04345) for its detail).
+See [Fusejima, et al. (2023)](https://arxiv.org/abs/2205.04345) for its detail) is reporeted.
 ```{r basic usage}
 res_rd <- rdtest::rdtest(Z = Z, vec_X = vec_X)
 ans <- summary(res_rd)
@@ -97,7 +97,7 @@ With `bool_max_test` option TRUE, `rdtest` returns max test result instead of
 res_rd <- rdtest::rdtest(Z = Z, vec_X = vec_X, bool_max_test = TRUE)
 ans <- summary(res_rd)
 ```
-In the above example, var5 has naive p-value of 0.026, but neither *sWald* test
+In the above example, var5 has a naive p-value of 0.026, but neither *sWald* test
 nor *max* test reject the joint null hypothesis of the whole 10 covariates and
 the density satisfying the continuity condition as designed.
 
@@ -105,13 +105,13 @@ the density satisfying the continuity condition as designed.
 Based on our simulation exercises, we recommend the following rule-of-thumb:
 
 - *max* test is recommended when a researcher has a particularly concerning
-covariate among up to 5 covariates. For example, a proxy variable for the
+covariates among up to 5 covariates. For example, a proxy variable for the
 outcome or a placebo test may be of interest.
 
-- *sWald* test is recommended when a researcher has no prior concern on a
+- *sWald* test is recommended when a researcher has no prior concern about a
 specific covariate in violation of the continuity. In simulation, *sWald* test
 demonstrates a better performance than *max* test for 10 and 25 covariates in
 its size control.
 
-- Nevertheless, we recommend limiting one's focus on a fewer set of covariates
-(at most 10) for either tests.
+- Nevertheless, we recommend limiting one's focus to a fewer set of covariates
+(at most 10) for either test.
