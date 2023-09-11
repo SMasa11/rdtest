@@ -1,5 +1,5 @@
 ---
-title: "vignette"
+title: "vignette for rdtest: A joint diagnosis for regression discontinuity designs."
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{vignette}
@@ -14,9 +14,49 @@ knitr::opts_chunk$set(
 )
 ```
 
+*rdtest* offers a joint diagnostic procedure for the testable restrictions of
+regression discontinuity (RD) designs. This package combines the existing
+packages of diagnostic testing (rddensity and rdrobust) to offer a set of joint
+test statistics to evaluate the validity of a given RD design. The theoretical
+background of this package is provided in [Fusejima, Ishihara, and Sawada (2023,
+arXiv)](https://arxiv.org/abs/2205.04345).
+
+## Background
+The sufficient condition for identification in RD design, local randomization,
+has two implications: continuous density function and balancing of
+pre-treatment covariates. Violation of any of these testable restrictions raises
+a concern about the sufficient condition. (Nevertheless, these testable
+restrictions are not directly related to identification itself. See [Ishihara
+and Sawada (2023)](https://arxiv.org/abs/2009.07551) for further details.)
+
+Both testable restrictions are implemented in R packages, for example,
+[*rddensity*](https://rdpackages.github.io/rddensity/) ([Calonico, Cattaneo, and Titiunik (2014)](https://onlinelibrary.wiley.com/doi/10.3982/ECTA11757)) for the former and [*rdrobust*](https://rdpackages.github.io/rdrobust/) ([Cattaneo, Jansson, and Ma (2020)](https://www.tandfonline.com/doi/abs/10.1080/01621459.2019.1635480)) for the latter. As pointed
+out in [Fusejima, et al. (2023)](https://arxiv.org/abs/2205.04345), however,
+multiple tests (median number of tests is 12) are run in practice without
+appropriate size control for most of the studies. Consequently, these RD
+practices suffer from massive size distortion due to *multiple testing problem*.
+Among 60 papers studied, 35\% of studies reject at least one of these testable
+restrictions; however, the rejection of each test separately is approximately 5\%.
+Hence, the RD designs in these studies appear to maintain the null hypotheses;
+however, not a small fraction of studies contain false rejections of the null
+hypotheses more frequently than they should be. Our *rdtest* package is the
+resolution to this multiple testing problem.
+
+## Installation
+
+You can install the development version of rdtest from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("SMasa11/rdtest")
+```
+
+## Usages
+
 `Z` may be either a numeric vector or a data.frame containing covariates.
 ```{r setup}
 library(rdtest)
+library(haven)
 set.seed(1)
 N <- 1000
 Z <- data.frame(var1 = rnorm(N),
@@ -44,3 +84,95 @@ By toggling `bool_L2_std` option FALSE, `rdtest` returns non-standardized Wald t
 res_rd <- rdtest::rdtest(Z = Z, vec_X = vec_X, bool_L2_std = FALSE)
 ans <- summary(res_rd)
 ```
+
+## Use cases:
+### Clark and Royer (2013, AER)
+Clark and Royer (2013) study the impact of the compulsory schooling changes in 
+UK on log odds of adulthood death rates. The policy changes prohibit students 
+from leaving school before grade nine (the 1947 reform) and from leaving school 
+before grade ten (the 1972 reform).
+
+In their Appendix Figure A1, they check the absence of discontinuity in births 
+and stillborn among the cohorts around the policy changes in 1947 and 1972 to
+verify that the differences in adulthood deaths are not driven by the 
+differences in the number of births and stillborn children.
+
+We confirm that their results are robust as the joint null hypothesis of no 
+difference whatsoever for the 1947 policy change cohorts
+```{r 1947 change}
+df_018 <- haven::read_stata("018_births.dta")
+df_018_1 <- data.frame(df_018[df_018$r == 1,c("births","still","s1mob1")])
+res_rd <- rdtest::rdtest(Z=df_018_1[,c("births","still")],vec_X = df_018_1$s1mob1)
+ans <- summary(res_rd)
+
+res_rd <- rdtest::rdtest(Z=df_018_1[,c("births","still")],vec_X = df_018_1$s1mob1,bool_max_test = TRUE)
+ans <- summary(res_rd)
+```
+as well as the 1972 policy change cohorts.
+```{r 1972 change}
+df_018 <- haven::read_stata("018_births.dta")
+df_018_2 <- data.frame(df_018[df_018$r == 2,c("births","still","s2mob1")])
+vec_nan <- is.nan(df_018_2[,1]) + is.na(df_018_2[,1])
+vec_nan <- vec_nan + is.nan(df_018_2[,2]) + is.na(df_018_2[,2])
+vec_nan <- vec_nan + is.nan(df_018_2[,3]) + is.na(df_018_2[,3])
+df_018_2 <- df_018_2[vec_nan == 0,]
+
+res_rd <- rdtest::rdtest(Z=df_018_2[,c("births","still")],vec_X = df_018_2$s2mob1)
+ans <- summary(res_rd)
+
+res_rd <- rdtest::rdtest(Z=df_018_2[,c("births","still")],vec_X = df_018_2$s2mob1,bool_max_test = TRUE)
+ans <- summary(res_rd)
+```
+
+### Pons and Tricaud (2018, Ecta)
+Pons and Tricaud (2018) study the impact of qualifying the third candidate for
+the second round of French parliamentary and local elections on the share of 
+registered citizens for the second round and shares of the top two candidates.
+
+French parliamentary and local elections are in two rounds. The top two 
+candidates of the first round are always qualified for the second round, but the
+third candidate is not necessarily. For the third candidates being qualified,
+their first-round vote share must be higher than 12.5 percent. The authors 
+exploit the threshold of having the third candidate as a fuzzy design on the 
+voter participation rates.
+
+In their Appendix Table B-I, they conduct placebo tests for five different 
+pre-determined covariates: the number of registered citizens, number of 
+candidates in the first round, turnout rate of the first round, the distance of 
+the top-two vote share in the first round, and the predicted assignment 
+probability of actually having the third candidates (not their qualification).
+
+We redo their analysis in our joint test for the joint null hypothesis of no 
+differences in any of the covariate means and density whatsoever. We confirm
+that the joint null hypothesis is not rejected, supporting the validity of the 
+original analysis further.
+```{r}
+df_165 <- haven::read_stata("165_analysis.dta")
+list_var <- c("nb_registered_R1",
+              "nb_candidates_R1",
+              "prop_registered_turnout_R1",
+              "distance_voteshare_cand12_R1",
+              "predicted_assignment")
+df_165 <- data.frame(df_165[,c(list_var,"running")])
+vec_nan <- is.nan(df_165[,1]) + is.na(df_165[,1])
+for (i in seq(2,6)) {
+  vec_nan <- vec_nan + is.nan(df_165[,i]) + is.na(df_165[,i])
+}
+print(sum((vec_nan > 0)))
+df_165 <- df_165[vec_nan == 0,]
+
+res_rd <- rdtest::rdtest(Z=df_165[,list_var],vec_X = df_165$running)
+ans <- summary(res_rd)
+
+res_rd <- rdtest::rdtest(Z=df_165[,list_var],vec_X = df_165$running,bool_max_test = TRUE)
+ans <- summary(res_rd)
+```
+
+### References for the applciations
+
+Clark, Damon, and Heather Royer. “The Effect of Education on Adult Mortality and Health: Evidence from Britain.” American Economic Review 103, no. 6 (October 1, 2013): 2087–2120. https://doi.org/10.1257/aer.103.6.2087.
+
+Data citation: Clark, Damon, and Royer, Heather. Replication data for: The Effect of Education on Adult Mortality and Health: Evidence from Britain. Nashville, TN: American Economic Association [publisher], 2013. Ann Arbor, MI: Inter-university Consortium for Political and Social Research [distributor], 2019-10-11. https://doi.org/10.3886/E112669V1
+
+Pons, Vincent, and Clémence Tricaud. “Expressive Voting and Its Cost: Evidence From Runoffs With Two or Three Candidates.” Econometrica 86, no. 5 (2018): 1621–49. https://doi.org/10.3982/ECTA15373.
+
