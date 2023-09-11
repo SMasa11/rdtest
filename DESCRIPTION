@@ -15,17 +15,17 @@ Description: This package offers a simultaneous implementation of two major
   discontinuity (RD) designs. Running these tests separately result in a serious
   over-rejection of the null hypothesis for justifying a RD design due to 
   multiple testing problem. Our joint test resolve the multiple testing problem.
-License: GPL (>= 3)
+License: file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.3
 URL: https://arxiv.org/abs/2205.04345
 BugReports: https://github.com/SMasa11/rdtest/issues
 Suggests: 
-    covr,
     dplyr (>= 1.0.9),
     ggplot2 (>= 3.3.6),
     gt (>= 0.6.0),
+    haven (>= 2.5.3),
     rmarkdown (>= 2.14),
     testthat (>= 3.0.0),
     tictoc (>= 1.0.1),
