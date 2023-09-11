@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>vignette for rdtest: A joint diagnosis for regression discontinuity designs.</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">vignette for rdtest: A joint diagnosis for
+regression discontinuity designs.</h1>
+
+
+
+<p><em>rdtest</em> offers a joint diagnostic procedure for the testable
+restrictions of regression discontinuity (RD) designs. This package
+combines the existing packages of diagnostic testing (rddensity and
+rdrobust) to offer a set of joint test statistics to evaluate the
+validity of a given RD design. The theoretical background of this
+package is provided in <a href="https://arxiv.org/abs/2205.04345">Fusejima, Ishihara, and Sawada
+(2023, arXiv)</a>.</p>
+<div id="background" class="section level2">
+<h2>Background</h2>
+<p>The sufficient condition for identification in RD design, local
+randomization, has two implications: continuous density function and
+balancing of pre-treatment covariates. Violation of any of these
+testable restrictions raises a concern about the sufficient condition.
+(Nevertheless, these testable restrictions are not directly related to
+identification itself. See <a href="https://arxiv.org/abs/2009.07551">Ishihara and Sawada (2023)</a>
+for further details.)</p>
+<p>Both testable restrictions are implemented in R packages, for
+example, <a href="https://rdpackages.github.io/rddensity/"><em>rddensity</em></a>
+(<a href="https://onlinelibrary.wiley.com/doi/10.3982/ECTA11757">Calonico,
+Cattaneo, and Titiunik (2014)</a>) for the former and <a href="https://rdpackages.github.io/rdrobust/"><em>rdrobust</em></a> (<a href="https://www.tandfonline.com/doi/abs/10.1080/01621459.2019.1635480">Cattaneo,
+Jansson, and Ma (2020)</a>) for the latter. As pointed out in <a href="https://arxiv.org/abs/2205.04345">Fusejima, et al. (2023)</a>,
+however, multiple tests (median number of tests is 12) are run in
+practice without appropriate size control for most of the studies.
+Consequently, these RD practices suffer from massive size distortion due
+to <em>multiple testing problem</em>. Among 60 papers studied, 35% of
+studies reject at least one of these testable restrictions; however, the
+rejection of each test separately is approximately 5%. Hence, the RD
+designs in these studies appear to maintain the null hypotheses;
+however, not a small fraction of studies contain false rejections of the
+null hypotheses more frequently than they should be. Our <em>rdtest</em>
+package is the resolution to this multiple testing problem.</p>
+</div>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<p>You can install the development version of rdtest from <a href="https://github.com/">GitHub</a> with:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co"># install.packages(&quot;devtools&quot;)</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;SMasa11/rdtest&quot;</span>)</span></code></pre></div>
+</div>
+<div id="usages" class="section level2">
+<h2>Usages</h2>
+<p><code>Z</code> may be either a numeric vector or a data.frame
+containing covariates.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">library</span>(rdtest)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">library</span>(haven)</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>Z <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">var1 =</span> <span class="fu">rnorm</span>(N),</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>                <span class="at">var2 =</span> <span class="fu">rnorm</span>(N),</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>                <span class="at">var3 =</span> <span class="fu">rnorm</span>(N),</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>                <span class="at">var4 =</span> <span class="fu">rnorm</span>(N),</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>                <span class="at">var5 =</span> <span class="fu">rnorm</span>(N))</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>vec_X <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(N)</span></code></pre></div>
+<p>Default option is standardized Wald statistics
+(<code>sWald</code>).</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>res_rd <span class="ot">&lt;-</span> rdtest<span class="sc">::</span><span class="fu">rdtest</span>(<span class="at">Z =</span> Z, <span class="at">vec_X =</span> vec_X)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>ans <span class="ot">&lt;-</span> <span class="fu">summary</span>(res_rd)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt; Call: rdtest::rdtest(Z = Z, vec_X = vec_X)</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt;  Naive test results:</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt; ========  ======  ===============</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt; Variable  t-stat  (Naive) p-value</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt; ========  ======  ===============</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt; density   -0.303  0.381          </span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt; var1      -0.182  0.428          </span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co">#&gt; var2      0.125   0.45           </span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co">#&gt; var3      0.403   0.343          </span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="co">#&gt; var4      1.53    0.063          </span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co">#&gt; var5      -0.301  0.382          </span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="co">#&gt; ========  ======  ===============</span></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="co">#&gt;  Joint test result: covariates and density.</span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="co">#&gt; ===  ======================  ==============  ==============  =============</span></span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a><span class="co">#&gt; \    Test Type               Test Statistic  Critical Value  Joint p-value</span></span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co">#&gt; ===  ======================  ==============  ==============  =============</span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="co">#&gt; 95%  standardized Wald test  2.737           12.825          0.834        </span></span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a><span class="co">#&gt; ===  ======================  ==============  ==============  =============</span></span></code></pre></div>
+<p>With <code>bool_max_test</code> option TRUE, <code>rdtest</code>
+returns max test result instead of <code>sWald</code> test result.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>res_rd <span class="ot">&lt;-</span> rdtest<span class="sc">::</span><span class="fu">rdtest</span>(<span class="at">Z =</span> Z, <span class="at">vec_X =</span> vec_X, <span class="at">bool_max_test =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>ans <span class="ot">&lt;-</span> <span class="fu">summary</span>(res_rd)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co">#&gt; Call: rdtest::rdtest(Z = Z, vec_X = vec_X, bool_max_test = TRUE)</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt;  Naive test results:</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt; ========  ======  ===============</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; Variable  t-stat  (Naive) p-value</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt; ========  ======  ===============</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; density   -0.303  0.381          </span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; var1      -0.182  0.428          </span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt; var2      0.125   0.45           </span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; var3      0.403   0.343          </span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; var4      1.53    0.063          </span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt; var5      -0.301  0.382          </span></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt; ========  ======  ===============</span></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="co">#&gt;  Joint test result: covariates and density.</span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a><span class="co">#&gt; ===  =========  ==============  ==============  =============</span></span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a><span class="co">#&gt; \    Test Type  Test Statistic  Critical Value  Joint p-value</span></span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a><span class="co">#&gt; ===  =========  ==============  ==============  =============</span></span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a><span class="co">#&gt; 95%  Max test   2.344           6.794           0.535        </span></span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a><span class="co">#&gt; ===  =========  ==============  ==============  =============</span></span></code></pre></div>
+<p>By toggling <code>bool_L2_std</code> option FALSE,
+<code>rdtest</code> returns non-standardized Wald test result, but in
+simulation, the non-standardized test does not control its size
+appropriately.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>res_rd <span class="ot">&lt;-</span> rdtest<span class="sc">::</span><span class="fu">rdtest</span>(<span class="at">Z =</span> Z, <span class="at">vec_X =</span> vec_X, <span class="at">bool_L2_std =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>ans <span class="ot">&lt;-</span> <span class="fu">summary</span>(res_rd)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="co">#&gt; Call: rdtest::rdtest(Z = Z, vec_X = vec_X, bool_L2_std = FALSE)</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt;  Naive test results:</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt; ========  ======  ===============</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt; Variable  t-stat  (Naive) p-value</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#&gt; ========  ======  ===============</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt; density   -0.303  0.381          </span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt; var1      -0.182  0.428          </span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co">#&gt; var2      0.125   0.45           </span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co">#&gt; var3      0.403   0.343          </span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="co">#&gt; var4      1.53    0.063          </span></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="co">#&gt; var5      -0.301  0.382          </span></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="co">#&gt; ========  ======  ===============</span></span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co">#&gt;  Joint test result: covariates and density.</span></span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; ============================  ==============  ==============  =============</span></span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a><span class="co">#&gt; Test Type                     Test Statistic  Critical Value  Joint p-value</span></span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="co">#&gt; ============================  ==============  ==============  =============</span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; (non-standardized) Wald test  2.807           12.592          0.833        </span></span>
+<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt; ============================  ==============  ==============  =============</span></span></code></pre></div>
+</div>
+<div id="use-cases" class="section level2">
+<h2>Use cases:</h2>
+<div id="clark-and-royer-2013-aer" class="section level3">
+<h3>Clark and Royer (2013, AER)</h3>
+<p>Clark and Royer (2013) study the impact of the compulsory schooling
+changes in UK on log odds of adulthood death rates. The policy changes
+prohibit students from leaving school before grade nine (the 1947
+reform) and from leaving school before grade ten (the 1972 reform).</p>
+<p>In their Appendix Figure A1, they check the absence of discontinuity
+in births and stillborn among the cohorts around the policy changes in
+1947 and 1972 to verify that the differences in adulthood deaths are not
+driven by the differences in the number of births and stillborn
+children.</p>
+<p>We confirm that their results are robust as the joint null hypothesis
+of no difference whatsoever for the 1947 policy change cohorts</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>df_018 <span class="ot">&lt;-</span> haven<span class="sc">::</span><span class="fu">read_stata</span>(<span class="st">&quot;018_births.dta&quot;</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>df_018_1 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(df_018[df_018<span class="sc">$</span>r <span class="sc">==</span> <span class="dv">1</span>,<span class="fu">c</span>(<span class="st">&quot;births&quot;</span>,<span class="st">&quot;still&quot;</span>,<span class="st">&quot;s1mob1&quot;</span>)])</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>res_rd <span class="ot">&lt;-</span> rdtest<span class="sc">::</span><span class="fu">rdtest</span>(<span class="at">Z=</span>df_018_1[,<span class="fu">c</span>(<span class="st">&quot;births&quot;</span>,<span class="st">&quot;still&quot;</span>)],<span class="at">vec_X =</span> df_018_1<span class="sc">$</span>s1mob1)</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>ans <span class="ot">&lt;-</span> <span class="fu">summary</span>(res_rd)</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co">#&gt; Call: rdtest::rdtest(Z = df_018_1[, c(&quot;births&quot;, &quot;still&quot;)], vec_X = df_018_1$s1mob1)</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co">#&gt;  Naive test results:</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co">#&gt; ========  ======  ===============</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co">#&gt; Variable  t-stat  (Naive) p-value</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co">#&gt; ========  ======  ===============</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="co">#&gt; density   0       0.5            </span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="co">#&gt; births    -0.554  0.29           </span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="co">#&gt; still     -1.223  0.111          </span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a><span class="co">#&gt; ========  ======  ===============</span></span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a><span class="co">#&gt;  Joint test result: covariates and density.</span></span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a><span class="co">#&gt; ===  ======================  ==============  ==============  =============</span></span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a><span class="co">#&gt; \    Test Type               Test Statistic  Critical Value  Joint p-value</span></span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a><span class="co">#&gt; ===  ======================  ==============  ==============  =============</span></span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a><span class="co">#&gt; 95%  standardized Wald test  2.974           8.118           0.377        </span></span>
+<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a><span class="co">#&gt; ===  ======================  ==============  ==============  =============</span></span>
+<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a></span>
+<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a>res_rd <span class="ot">&lt;-</span> rdtest<span class="sc">::</span><span class="fu">rdtest</span>(<span class="at">Z=</span>df_018_1[,<span class="fu">c</span>(<span class="st">&quot;births&quot;</span>,<span class="st">&quot;still&quot;</span>)],<span class="at">vec_X =</span> df_018_1<span class="sc">$</span>s1mob1,<span class="at">bool_max_test =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a>ans <span class="ot">&lt;-</span> <span class="fu">summary</span>(res_rd)</span>
+<span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a><span class="co">#&gt; Call: rdtest::rdtest(Z = df_018_1[, c(&quot;births&quot;, &quot;still&quot;)], vec_X = df_018_1$s1mob1, </span></span>
+<span id="cb6-29"><a href="#cb6-29" tabindex="-1"></a><span class="co">#&gt;     bool_max_test = TRUE)</span></span>
+<span id="cb6-30"><a href="#cb6-30" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-31"><a href="#cb6-31" tabindex="-1"></a><span class="co">#&gt;  Naive test results:</span></span>
+<span id="cb6-32"><a href="#cb6-32" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-33"><a href="#cb6-33" tabindex="-1"></a><span class="co">#&gt; ========  ======  ===============</span></span>
+<span id="cb6-34"><a href="#cb6-34" tabindex="-1"></a><span class="co">#&gt; Variable  t-stat  (Naive) p-value</span></span>
+<span id="cb6-35"><a href="#cb6-35" tabindex="-1"></a><span class="co">#&gt; ========  ======  ===============</span></span>
+<span id="cb6-36"><a href="#cb6-36" tabindex="-1"></a><span class="co">#&gt; density   0       0.5            </span></span>
+<span id="cb6-37"><a href="#cb6-37" tabindex="-1"></a><span class="co">#&gt; births    -0.554  0.29           </span></span>
+<span id="cb6-38"><a href="#cb6-38" tabindex="-1"></a><span class="co">#&gt; still     -1.223  0.111          </span></span>
+<span id="cb6-39"><a href="#cb6-39" tabindex="-1"></a><span class="co">#&gt; ========  ======  ===============</span></span>
+<span id="cb6-40"><a href="#cb6-40" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-41"><a href="#cb6-41" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-42"><a href="#cb6-42" tabindex="-1"></a><span class="co">#&gt;  Joint test result: covariates and density.</span></span>
+<span id="cb6-43"><a href="#cb6-43" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-44"><a href="#cb6-44" tabindex="-1"></a><span class="co">#&gt; ===  =========  ==============  ==============  =============</span></span>
+<span id="cb6-45"><a href="#cb6-45" tabindex="-1"></a><span class="co">#&gt; \    Test Type  Test Statistic  Critical Value  Joint p-value</span></span>
+<span id="cb6-46"><a href="#cb6-46" tabindex="-1"></a><span class="co">#&gt; ===  =========  ==============  ==============  =============</span></span>
+<span id="cb6-47"><a href="#cb6-47" tabindex="-1"></a><span class="co">#&gt; 95%  Max test   1.621           5.708           0.464        </span></span>
+<span id="cb6-48"><a href="#cb6-48" tabindex="-1"></a><span class="co">#&gt; ===  =========  ==============  ==============  =============</span></span></code></pre></div>
+<p>as well as the 1972 policy change cohorts.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>df_018 <span class="ot">&lt;-</span> haven<span class="sc">::</span><span class="fu">read_stata</span>(<span class="st">&quot;018_births.dta&quot;</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>df_018_2 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(df_018[df_018<span class="sc">$</span>r <span class="sc">==</span> <span class="dv">2</span>,<span class="fu">c</span>(<span class="st">&quot;births&quot;</span>,<span class="st">&quot;still&quot;</span>,<span class="st">&quot;s2mob1&quot;</span>)])</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>vec_nan <span class="ot">&lt;-</span> <span class="fu">is.nan</span>(df_018_2[,<span class="dv">1</span>]) <span class="sc">+</span> <span class="fu">is.na</span>(df_018_2[,<span class="dv">1</span>])</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>vec_nan <span class="ot">&lt;-</span> vec_nan <span class="sc">+</span> <span class="fu">is.nan</span>(df_018_2[,<span class="dv">2</span>]) <span class="sc">+</span> <span class="fu">is.na</span>(df_018_2[,<span class="dv">2</span>])</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>vec_nan <span class="ot">&lt;-</span> vec_nan <span class="sc">+</span> <span class="fu">is.nan</span>(df_018_2[,<span class="dv">3</span>]) <span class="sc">+</span> <span class="fu">is.na</span>(df_018_2[,<span class="dv">3</span>])</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>df_018_2 <span class="ot">&lt;-</span> df_018_2[vec_nan <span class="sc">==</span> <span class="dv">0</span>,]</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>res_rd <span class="ot">&lt;-</span> rdtest<span class="sc">::</span><span class="fu">rdtest</span>(<span class="at">Z=</span>df_018_2[,<span class="fu">c</span>(<span class="st">&quot;births&quot;</span>,<span class="st">&quot;still&quot;</span>)],<span class="at">vec_X =</span> df_018_2<span class="sc">$</span>s2mob1)</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>ans <span class="ot">&lt;-</span> <span class="fu">summary</span>(res_rd)</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co">#&gt; Call: rdtest::rdtest(Z = df_018_2[, c(&quot;births&quot;, &quot;still&quot;)], vec_X = df_018_2$s2mob1)</span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="co">#&gt;  Naive test results:</span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="co">#&gt; ========  ======  ===============</span></span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a><span class="co">#&gt; Variable  t-stat  (Naive) p-value</span></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a><span class="co">#&gt; ========  ======  ===============</span></span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a><span class="co">#&gt; density   0       0.5            </span></span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a><span class="co">#&gt; births    -1.367  0.086          </span></span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a><span class="co">#&gt; still     -0.412  0.34           </span></span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="co">#&gt; ========  ======  ===============</span></span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a><span class="co">#&gt;  Joint test result: covariates and density.</span></span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a><span class="co">#&gt; ===  ======================  ==============  ==============  =============</span></span>
+<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a><span class="co">#&gt; \    Test Type               Test Statistic  Critical Value  Joint p-value</span></span>
+<span id="cb7-27"><a href="#cb7-27" tabindex="-1"></a><span class="co">#&gt; ===  ======================  ==============  ==============  =============</span></span>
+<span id="cb7-28"><a href="#cb7-28" tabindex="-1"></a><span class="co">#&gt; 95%  standardized Wald test  1.404           8.155           0.697        </span></span>
+<span id="cb7-29"><a href="#cb7-29" tabindex="-1"></a><span class="co">#&gt; ===  ======================  ==============  ==============  =============</span></span>
+<span id="cb7-30"><a href="#cb7-30" tabindex="-1"></a></span>
+<span id="cb7-31"><a href="#cb7-31" tabindex="-1"></a>res_rd <span class="ot">&lt;-</span> rdtest<span class="sc">::</span><span class="fu">rdtest</span>(<span class="at">Z=</span>df_018_2[,<span class="fu">c</span>(<span class="st">&quot;births&quot;</span>,<span class="st">&quot;still&quot;</span>)],<span class="at">vec_X =</span> df_018_2<span class="sc">$</span>s2mob1,<span class="at">bool_max_test =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb7-32"><a href="#cb7-32" tabindex="-1"></a>ans <span class="ot">&lt;-</span> <span class="fu">summary</span>(res_rd)</span>
+<span id="cb7-33"><a href="#cb7-33" tabindex="-1"></a><span class="co">#&gt; Call: rdtest::rdtest(Z = df_018_2[, c(&quot;births&quot;, &quot;still&quot;)], vec_X = df_018_2$s2mob1, </span></span>
+<span id="cb7-34"><a href="#cb7-34" tabindex="-1"></a><span class="co">#&gt;     bool_max_test = TRUE)</span></span>
+<span id="cb7-35"><a href="#cb7-35" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-36"><a href="#cb7-36" tabindex="-1"></a><span class="co">#&gt;  Naive test results:</span></span>
+<span id="cb7-37"><a href="#cb7-37" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-38"><a href="#cb7-38" tabindex="-1"></a><span class="co">#&gt; ========  ======  ===============</span></span>
+<span id="cb7-39"><a href="#cb7-39" tabindex="-1"></a><span class="co">#&gt; Variable  t-stat  (Naive) p-value</span></span>
+<span id="cb7-40"><a href="#cb7-40" tabindex="-1"></a><span class="co">#&gt; ========  ======  ===============</span></span>
+<span id="cb7-41"><a href="#cb7-41" tabindex="-1"></a><span class="co">#&gt; density   0       0.5            </span></span>
+<span id="cb7-42"><a href="#cb7-42" tabindex="-1"></a><span class="co">#&gt; births    -1.367  0.086          </span></span>
+<span id="cb7-43"><a href="#cb7-43" tabindex="-1"></a><span class="co">#&gt; still     -0.412  0.34           </span></span>
+<span id="cb7-44"><a href="#cb7-44" tabindex="-1"></a><span class="co">#&gt; ========  ======  ===============</span></span>
+<span id="cb7-45"><a href="#cb7-45" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-46"><a href="#cb7-46" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-47"><a href="#cb7-47" tabindex="-1"></a><span class="co">#&gt;  Joint test result: covariates and density.</span></span>
+<span id="cb7-48"><a href="#cb7-48" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb7-49"><a href="#cb7-49" tabindex="-1"></a><span class="co">#&gt; ===  =========  ==============  ==============  =============</span></span>
+<span id="cb7-50"><a href="#cb7-50" tabindex="-1"></a><span class="co">#&gt; \    Test Type  Test Statistic  Critical Value  Joint p-value</span></span>
+<span id="cb7-51"><a href="#cb7-51" tabindex="-1"></a><span class="co">#&gt; ===  =========  ==============  ==============  =============</span></span>
+<span id="cb7-52"><a href="#cb7-52" tabindex="-1"></a><span class="co">#&gt; 95%  Max test   1.267           5.568           0.589        </span></span>
+<span id="cb7-53"><a href="#cb7-53" tabindex="-1"></a><span class="co">#&gt; ===  =========  ==============  ==============  =============</span></span></code></pre></div>
+</div>
+<div id="pons-and-tricaud-2018-ecta" class="section level3">
+<h3>Pons and Tricaud (2018, Ecta)</h3>
+<p>Pons and Tricaud (2018) study the impact of qualifying the third
+candidate for the second round of French parliamentary and local
+elections on the share of registered citizens for the second round and
+shares of the top two candidates.</p>
+<p>French parliamentary and local elections are in two rounds. The top
+two candidates of the first round are always qualified for the second
+round, but the third candidate is not necessarily. For the third
+candidates being qualified, their first-round vote share must be higher
+than 12.5 percent. The authors exploit the threshold of having the third
+candidate as a fuzzy design on the voter participation rates.</p>
+<p>In their Appendix Table B-I, they conduct placebo tests for five
+different pre-determined covariates: the number of registered citizens,
+number of candidates in the first round, turnout rate of the first
+round, the distance of the top-two vote share in the first round, and
+the predicted assignment probability of actually having the third
+candidates (not their qualification).</p>
+<p>We redo their analysis in our joint test for the joint null
+hypothesis of no differences in any of the covariate means and density
+whatsoever. We confirm that the joint null hypothesis is not rejected,
+supporting the validity of the original analysis further.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>df_165 <span class="ot">&lt;-</span> haven<span class="sc">::</span><span class="fu">read_stata</span>(<span class="st">&quot;165_analysis.dta&quot;</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>list_var <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;nb_registered_R1&quot;</span>,</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>              <span class="st">&quot;nb_candidates_R1&quot;</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>              <span class="st">&quot;prop_registered_turnout_R1&quot;</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>              <span class="st">&quot;distance_voteshare_cand12_R1&quot;</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>              <span class="st">&quot;predicted_assignment&quot;</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>df_165 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(df_165[,<span class="fu">c</span>(list_var,<span class="st">&quot;running&quot;</span>)])</span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>vec_nan <span class="ot">&lt;-</span> <span class="fu">is.nan</span>(df_165[,<span class="dv">1</span>]) <span class="sc">+</span> <span class="fu">is.na</span>(df_165[,<span class="dv">1</span>])</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq</span>(<span class="dv">2</span>,<span class="dv">6</span>)) {</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>  vec_nan <span class="ot">&lt;-</span> vec_nan <span class="sc">+</span> <span class="fu">is.nan</span>(df_165[,i]) <span class="sc">+</span> <span class="fu">is.na</span>(df_165[,i])</span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>}</span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">sum</span>((vec_nan <span class="sc">&gt;</span> <span class="dv">0</span>)))</span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a><span class="co">#&gt; [1] 2</span></span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>df_165 <span class="ot">&lt;-</span> df_165[vec_nan <span class="sc">==</span> <span class="dv">0</span>,]</span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a></span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a>res_rd <span class="ot">&lt;-</span> rdtest<span class="sc">::</span><span class="fu">rdtest</span>(<span class="at">Z=</span>df_165[,list_var],<span class="at">vec_X =</span> df_165<span class="sc">$</span>running)</span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a>ans <span class="ot">&lt;-</span> <span class="fu">summary</span>(res_rd)</span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a><span class="co">#&gt; Call: rdtest::rdtest(Z = df_165[, list_var], vec_X = df_165$running)</span></span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a><span class="co">#&gt;  Naive test results:</span></span>
+<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a><span class="co">#&gt; ============================  ======  ===============</span></span>
+<span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a><span class="co">#&gt; Variable                      t-stat  (Naive) p-value</span></span>
+<span id="cb8-24"><a href="#cb8-24" tabindex="-1"></a><span class="co">#&gt; ============================  ======  ===============</span></span>
+<span id="cb8-25"><a href="#cb8-25" tabindex="-1"></a><span class="co">#&gt; density                       -0.59   0.278          </span></span>
+<span id="cb8-26"><a href="#cb8-26" tabindex="-1"></a><span class="co">#&gt; nb_registered_R1              1.086   0.139          </span></span>
+<span id="cb8-27"><a href="#cb8-27" tabindex="-1"></a><span class="co">#&gt; nb_candidates_R1              -0.784  0.216          </span></span>
+<span id="cb8-28"><a href="#cb8-28" tabindex="-1"></a><span class="co">#&gt; prop_registered_turnout_R1    -0.309  0.379          </span></span>
+<span id="cb8-29"><a href="#cb8-29" tabindex="-1"></a><span class="co">#&gt; distance_voteshare_cand12_R1  0.293   0.385          </span></span>
+<span id="cb8-30"><a href="#cb8-30" tabindex="-1"></a><span class="co">#&gt; predicted_assignment          0.104   0.459          </span></span>
+<span id="cb8-31"><a href="#cb8-31" tabindex="-1"></a><span class="co">#&gt; ============================  ======  ===============</span></span>
+<span id="cb8-32"><a href="#cb8-32" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-33"><a href="#cb8-33" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-34"><a href="#cb8-34" tabindex="-1"></a><span class="co">#&gt;  Joint test result: covariates and density.</span></span>
+<span id="cb8-35"><a href="#cb8-35" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-36"><a href="#cb8-36" tabindex="-1"></a><span class="co">#&gt; ===  ======================  ==============  ==============  =============</span></span>
+<span id="cb8-37"><a href="#cb8-37" tabindex="-1"></a><span class="co">#&gt; \    Test Type               Test Statistic  Critical Value  Joint p-value</span></span>
+<span id="cb8-38"><a href="#cb8-38" tabindex="-1"></a><span class="co">#&gt; ===  ======================  ==============  ==============  =============</span></span>
+<span id="cb8-39"><a href="#cb8-39" tabindex="-1"></a><span class="co">#&gt; 95%  standardized Wald test  2.337           13.3            0.854        </span></span>
+<span id="cb8-40"><a href="#cb8-40" tabindex="-1"></a><span class="co">#&gt; ===  ======================  ==============  ==============  =============</span></span>
+<span id="cb8-41"><a href="#cb8-41" tabindex="-1"></a></span>
+<span id="cb8-42"><a href="#cb8-42" tabindex="-1"></a>res_rd <span class="ot">&lt;-</span> rdtest<span class="sc">::</span><span class="fu">rdtest</span>(<span class="at">Z=</span>df_165[,list_var],<span class="at">vec_X =</span> df_165<span class="sc">$</span>running,<span class="at">bool_max_test =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb8-43"><a href="#cb8-43" tabindex="-1"></a>ans <span class="ot">&lt;-</span> <span class="fu">summary</span>(res_rd)</span>
+<span id="cb8-44"><a href="#cb8-44" tabindex="-1"></a><span class="co">#&gt; Call: rdtest::rdtest(Z = df_165[, list_var], vec_X = df_165$running, </span></span>
+<span id="cb8-45"><a href="#cb8-45" tabindex="-1"></a><span class="co">#&gt;     bool_max_test = TRUE)</span></span>
+<span id="cb8-46"><a href="#cb8-46" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-47"><a href="#cb8-47" tabindex="-1"></a><span class="co">#&gt;  Naive test results:</span></span>
+<span id="cb8-48"><a href="#cb8-48" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-49"><a href="#cb8-49" tabindex="-1"></a><span class="co">#&gt; ============================  ======  ===============</span></span>
+<span id="cb8-50"><a href="#cb8-50" tabindex="-1"></a><span class="co">#&gt; Variable                      t-stat  (Naive) p-value</span></span>
+<span id="cb8-51"><a href="#cb8-51" tabindex="-1"></a><span class="co">#&gt; ============================  ======  ===============</span></span>
+<span id="cb8-52"><a href="#cb8-52" tabindex="-1"></a><span class="co">#&gt; density                       -0.59   0.278          </span></span>
+<span id="cb8-53"><a href="#cb8-53" tabindex="-1"></a><span class="co">#&gt; nb_registered_R1              1.086   0.139          </span></span>
+<span id="cb8-54"><a href="#cb8-54" tabindex="-1"></a><span class="co">#&gt; nb_candidates_R1              -0.784  0.216          </span></span>
+<span id="cb8-55"><a href="#cb8-55" tabindex="-1"></a><span class="co">#&gt; prop_registered_turnout_R1    -0.309  0.379          </span></span>
+<span id="cb8-56"><a href="#cb8-56" tabindex="-1"></a><span class="co">#&gt; distance_voteshare_cand12_R1  0.293   0.385          </span></span>
+<span id="cb8-57"><a href="#cb8-57" tabindex="-1"></a><span class="co">#&gt; predicted_assignment          0.104   0.459          </span></span>
+<span id="cb8-58"><a href="#cb8-58" tabindex="-1"></a><span class="co">#&gt; ============================  ======  ===============</span></span>
+<span id="cb8-59"><a href="#cb8-59" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-60"><a href="#cb8-60" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-61"><a href="#cb8-61" tabindex="-1"></a><span class="co">#&gt;  Joint test result: covariates and density.</span></span>
+<span id="cb8-62"><a href="#cb8-62" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb8-63"><a href="#cb8-63" tabindex="-1"></a><span class="co">#&gt; ===  =========  ==============  ==============  =============</span></span>
+<span id="cb8-64"><a href="#cb8-64" tabindex="-1"></a><span class="co">#&gt; \    Test Type  Test Statistic  Critical Value  Joint p-value</span></span>
+<span id="cb8-65"><a href="#cb8-65" tabindex="-1"></a><span class="co">#&gt; ===  =========  ==============  ==============  =============</span></span>
+<span id="cb8-66"><a href="#cb8-66" tabindex="-1"></a><span class="co">#&gt; 95%  Max test   1.2             6.623           0.813        </span></span>
+<span id="cb8-67"><a href="#cb8-67" tabindex="-1"></a><span class="co">#&gt; ===  =========  ==============  ==============  =============</span></span></code></pre></div>
+</div>
+<div id="references-for-the-applciations" class="section level3">
+<h3>References for the applciations</h3>
+<p>Clark, Damon, and Heather Royer. “The Effect of Education on Adult
+Mortality and Health: Evidence from Britain.” American Economic Review
+103, no. 6 (October 1, 2013): 2087–2120. <a href="https://doi.org/10.1257/aer.103.6.2087" class="uri">https://doi.org/10.1257/aer.103.6.2087</a>.</p>
+<p>Data citation: Clark, Damon, and Royer, Heather. Replication data
+for: The Effect of Education on Adult Mortality and Health: Evidence
+from Britain. Nashville, TN: American Economic Association [publisher],
+2013. Ann Arbor, MI: Inter-university Consortium for Political and
+Social Research [distributor], 2019-10-11. <a href="https://doi.org/10.3886/E112669V1" class="uri">https://doi.org/10.3886/E112669V1</a></p>
+<p>Pons, Vincent, and Clémence Tricaud. “Expressive Voting and Its Cost:
+Evidence From Runoffs With Two or Three Candidates.” Econometrica 86,
+no. 5 (2018): 1621–49. <a href="https://doi.org/10.3982/ECTA15373" class="uri">https://doi.org/10.3982/ECTA15373</a>.</p>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
