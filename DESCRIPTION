@@ -1,7 +1,7 @@
 Package: rdtest
 Type: Package
 Title: Joint Diagnosis for Regression Discontinuity Designs
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: c(
   person("Masayuki","Sawada", email="m-sawada@ier.hit-u.ac.jp",
     role = c("aut","cre")),

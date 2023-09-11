@@ -60,6 +60,9 @@ devtools::install_github("SMasa11/rdtest")
 
 ## Usage
 
+Please see the vignette for the practical usages in the empirical
+applications.
+
 *rdtest* package minimally expects a pair of variables:
 
 - Z : a vector or a data.frame of pre-determined covariates whose
