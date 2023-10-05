@@ -22,7 +22,7 @@ return_result_joint <- function(df_data,
   list_result_covariate <-
     compute_test_stat(df_data = df_data,
                     int_dim_Z = int_dim_Z,
-                    bool_joint = TRUE,
+                    bool_joint = bool_joint,
                     int_J = int_J,
                     bool_L2_std = bool_L2_std,
                     bool_max_test = bool_max_test)
@@ -100,8 +100,12 @@ return_result_joint <- function(df_data,
       }
     }
   } else {
-    real_stat_max_joint <-
-      max(list_result_covariate$real_stat,real_tstat_X^2)
+    if (bool_joint) {
+      real_stat_max_joint <-
+        max(list_result_covariate$real_stat,real_tstat_X^2)
+    } else {
+      real_stat_max_joint <- max(list_result_covariate$real_stat)
+    }
     vec_random_draw_stat <- rep(0,int_num_simul_draw)
     mat_cor <- matrix(rep(0,(int_dim_total)^2),int_dim_total,int_dim_total)
     mat_cor[1:int_dim_Z,1:int_dim_Z] <- list_result_covariate$mat_cor
