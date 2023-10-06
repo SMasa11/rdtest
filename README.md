@@ -15,8 +15,7 @@ rdrobust) to offer a set of joint test statistics to evaluate the
 validity of a given RD design. The theoretical background of this
 package is provided in [Fusejima, Ishihara, and Sawada (2023,
 arXiv)](https://arxiv.org/abs/2205.04345). This work is supported by
-JSPS KAKENHI Grant Number 22K13373 (Fusejima); JP20J00900 (Ishihara);
-and 21K13269 (Sawada).
+JSPS KAKENHI Grant Number JP20J20046 (Fusejima), 22K13373 (Ishihara), and 21K13269 (Sawada).
 
 ## Background
 
