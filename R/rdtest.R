@@ -11,6 +11,13 @@
 #'
 #' @param Z Data.frame or Vector, pre-determined covariates.
 #' @param vec_X Vector, running variable X.
+#' @param weights Vector, variable used for optional weighting of the estimation
+#'   procedure. The unit-specific weights multiply the kernel function. Note that
+#'   weights are not applied to the density test, as rddensity does not allow
+#'   weights.
+#' @param covs Data.frame or Vector, optional control covariates for rdrobust.
+#' @param kernel is the kernel function used to construct the local-polynomial
+#'   estimator(s). Options are triangular (default option), epanechnikov and uniform.
 #' @param bool_joint Boolean, TRUE if joint test instead of balance test only,
 #'   default is TRUE.
 #' @param int_J Integer, the number or nearest neighbor for the variance
@@ -43,6 +50,9 @@
 
 rdtest <- function(Z,
                    vec_X,
+                   weights = NULL,
+                   covs = NULL,
+                   kernel = "triangular",
                    bool_joint = TRUE,
                    int_J = 3,
                    real_cutoff = 0,
@@ -83,6 +93,49 @@ rdtest <- function(Z,
   if (!(bool_joint == 0) & !(bool_joint == 1)) {
     stop("bool_joint need to be either 0 or 1")}
 
+  #! CHECK IF weights are supplied properly
+  if (!(length(weights) == 0)) {
+    if (!(length(weights) == length(t(weights)))) {
+      stop("weights should be a vector of a single variable")}
+    if (max(is.nan(weights)) | max(is.na(weights))) {
+      stop("weights should not contain NaN or NA")}
+    if (!(length(weights) == length(Z[,1]))) {
+      stop("Number of observations should match for weights and Z.")}
+  }
+
+  # If weights are not supplied, assign weight of 1 to all observations.
+  if (length(weights) == 0) {
+    weights <- rep(1, length(Z[,1]))}
+
+  #! CHECK IF covariates are supplied properly
+  if (!(length(covs) == 0)) {
+    if (!is.data.frame(covs)) {
+      if (!is.numeric(covs)) {
+        stop("covs must be either a data.frame
+            or a vector of control covariates")
+      } else {
+        covs = data.frame(vec_Covs = covs)
+      }
+    }
+    for (i in length(covs)) {
+      if (max(is.nan(covs[,i])) | max(is.na(covs[,i]))) {
+        stop("covs should not contain NaN or NA")}
+    }
+    if (!(length(covs[,1]) == length(Z[,1]))) {
+      stop("Number of observations should match for covs and Z.")}
+  }
+
+  #! CHECK IF kernel is supplied properly
+  if (kernel != "uni" & kernel != "uniform" & kernel != "tri" &
+      kernel != "triangular" & kernel != "epa" & kernel !=
+      "epanechnikov") {
+    stop("kernel incorrectly specified")
+  }
+  #! The rddensity function does not work with the abbreviations.
+  if (kernel == "tri") {kernel = "triangular"}
+  if (kernel == "uni") {kernel = "uniform"}
+  if (kernel == "epa") {kernel = "epanechnikov"}
+
   # Retrieve the colnames of Z
   vec_col_name_Z <- colnames(Z)
   int_dim_Z <- length(vec_col_name_Z)
@@ -103,6 +156,9 @@ rdtest <- function(Z,
 
   list_result <- return_result_joint(
     df_data = df_data,
+    weights = weights,
+    covs = covs,
+    kernel = kernel,
     int_dim_Z = int_dim_Z,
     int_J = int_J,
     bool_max_test = bool_max_test,
