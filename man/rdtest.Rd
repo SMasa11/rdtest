@@ -7,6 +7,9 @@
 rdtest(
   Z,
   vec_X,
+  weights = NULL,
+  covs = NULL,
+  kernel = "triangular",
   bool_joint = TRUE,
   int_J = 3,
   real_cutoff = 0,
@@ -18,6 +21,16 @@ rdtest(
 \item{Z}{Data.frame or Vector, pre-determined covariates.}
 
 \item{vec_X}{Vector, running variable X.}
+
+\item{weights}{Vector, variable used for optional weighting of the estimation
+procedure. The unit-specific weights multiply the kernel function. Note that
+weights are not applied to the density test, as rddensity does not allow
+weights.}
+
+\item{covs}{Data.frame or Vector, optional control covariates for rdrobust.}
+
+\item{kernel}{is the kernel function used to construct the local-polynomial
+estimator(s). Options are triangular (default option), epanechnikov and uniform.}
 
 \item{bool_joint}{Boolean, TRUE if joint test instead of balance test only,
 default is TRUE.}

@@ -7,6 +7,9 @@
 return_result_joint(
   df_data,
   int_dim_Z,
+  weights = NULL,
+  covs = NULL,
+  kernel = "triangular",
   int_J = 3,
   bool_max_test = FALSE,
   bool_L2_std = TRUE,
@@ -17,6 +20,13 @@ return_result_joint(
 \item{df_data}{Data.frame, data to evaluate.}
 
 \item{int_dim_Z}{Integer, dimension of covariates.}
+
+\item{weights}{Weights of observations that multiply the kernel function.}
+
+\item{covs}{Data.frame or Vector, optional control covariates for rdrobust.}
+
+\item{kernel}{is the kernel function used to construct the local-polynomial
+estimator(s). Options are triangular (default option), epanechnikov and uniform.}
 
 \item{int_J}{Integer, nearest neighbor for the variance estimation <= 3
 default is 3.}

@@ -1,6 +1,10 @@
 #' return joint test result
 #'
 #' @param df_data Data.frame, data to evaluate.
+#' @param weights Weights of observations that multiply the kernel function.
+#' @param covs Data.frame or Vector, optional control covariates for rdrobust.
+#' @param kernel is the kernel function used to construct the local-polynomial
+#'   estimator(s). Options are triangular (default option), epanechnikov and uniform.
 #' @param int_dim_Z Integer, dimension of covariates.
 #' @param int_J Integer, nearest neighbor for the variance estimation <= 3
 #'  default is 3.
@@ -11,6 +15,9 @@
 
 return_result_joint <- function(df_data,
                                int_dim_Z,
+                               weights = NULL,
+                               covs = NULL,
+                               kernel = "triangular",
                                int_J = 3,
                                bool_max_test = FALSE,
                                bool_L2_std = TRUE,
@@ -22,6 +29,9 @@ return_result_joint <- function(df_data,
   list_result_covariate <-
     compute_test_stat(df_data = df_data,
                     int_dim_Z = int_dim_Z,
+                    weights = weights,
+                    covs = covs,
+                    kernel = kernel,
                     bool_joint = bool_joint,
                     int_J = int_J,
                     bool_L2_std = bool_L2_std,
@@ -35,7 +45,7 @@ return_result_joint <- function(df_data,
   int_dim_total <- int_dim_Z + bool_joint
   # Xstat
   tryCatch({
-    list_result_X <- rddensity::rddensity(X = df_data$vec_X)},
+    list_result_X <- rddensity::rddensity(X = df_data$vec_X, kernel = kernel)},
     error = function(e) {
       message(paste0("ERROR at rddensity"))
       message(e)

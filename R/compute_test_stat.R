@@ -4,6 +4,9 @@
 
 compute_test_stat <- function(df_data,
                             int_dim_Z,
+                            weights = NULL,
+                            covs = NULL,
+                            kernel = "triangular",
                             int_J = 3,
                             bool_max_test = FALSE,
                             bool_L2_std = FALSE,
@@ -95,6 +98,9 @@ compute_test_stat <- function(df_data,
         list_result_rdrobust_Z <- rdrobust::rdrobust(
           y=df_data$vec_Z.1,
           x = df_data$vec_X,
+          covs = covs,
+          kernel = kernel,
+          weights = weights,
           rho=1,
           bwselect='mserd'
         )},
@@ -107,7 +113,7 @@ compute_test_stat <- function(df_data,
       tryCatch({
         eval(parse(text = paste0(paste0(
           "list_result_rdrobust_Z <- rdrobust::rdrobust(y=df_data$vec_Z.",d),
-          ",x = df_data$vec_X,rho=1,bwselect='mserd')"
+          ",x = df_data$vec_X,covs=covs,kernel=kernel,weights = weights,rho=1,bwselect='mserd')"
         )))},
         error = function(e) {
           message(paste0("ERROR at rdrobust for vec_Z.",d))
@@ -128,7 +134,7 @@ compute_test_stat <- function(df_data,
     tryCatch({
       eval(parse(text = paste0(paste0(
         "list_result_rdrobust_Z_bias <- rdrobust::rdrobust(y=df_data$vec_Z.",d),
-        ",x=df_data$vec_X,p=2,rho=1,h=c(vec_h_L[d],vec_h_R[d]))"
+        ",x=df_data$vec_X,covs=covs,kernel=kernel,weights=weights,p=2,rho=1,h=c(vec_h_L[d],vec_h_R[d]))"
         )))},
       error = function(e) {
         message(paste0("ERROR at calculating bias rdrobust for vec_Z.",d))
