@@ -8,13 +8,16 @@
 #'  default is false.
 #' @param bool_L2_std Boolean, for using standardized t stat for L2 test.
 #' @param bool_joint Boolean, for returning joint test, instead of balance only.
+#' @param bool_stepdown Boolean, add holm-type correction for detecting more non-nulls. Active only if bool_joint is FALSE
+
 
 return_result_joint <- function(df_data,
                                int_dim_Z,
                                int_J = 3,
                                bool_max_test = FALSE,
                                bool_L2_std = TRUE,
-                               bool_joint = TRUE)
+                               bool_joint = TRUE,
+                               bool_stepdown = FALSE)
 {
   int_num_simul_draw <- 3000
 
@@ -25,7 +28,10 @@ return_result_joint <- function(df_data,
                     bool_joint = bool_joint,
                     int_J = int_J,
                     bool_L2_std = bool_L2_std,
-                    bool_max_test = bool_max_test)
+                    bool_max_test = bool_max_test,
+                    bool_stepdown = bool_stepdown)
+
+  # need to work on how to handle return when bool_stepdown is on
 
   bool_reject_naive_null <-
     list_result_covariate$bool_reject_naive_null

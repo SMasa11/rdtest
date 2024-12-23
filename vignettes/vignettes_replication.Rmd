@@ -1,0 +1,101 @@
+---
+title: "vignettes_replication"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{vignettes_replication}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(rdtest)
+library(haven)
+```
+
+```{r}
+df <- haven::read_dta("SIN19932003.dta")
+list_vars <- c("pop_res",
+               "NW",
+               "NE",
+               "CE",
+               "SOU",
+               "IS",
+               "active_pop",
+               "n_firms_pc",
+               "elderly_index",
+               "income_pc",
+               "electors_female_per",
+               "centerleft2",
+               "centerright2",
+               "age",
+               "n_terms",
+               "exp",
+               "born_prov",
+               "college",
+               "empl_not")
+df_Z <- df[,list_vars]
+
+vec_na <- is.na(df$votes_gender)
+for (var in list_vars) {
+  y <- dplyr::pull(df_Z,var)
+  vec_na <- vec_na + is.na(y)
+  summary(rdrobust::rdrobust(y = y,x = df$votes_gender,all=TRUE,rho=1,cluster = df$id_city_istat))
+}
+```
+
+```{r}
+df_Z_nonna <- data.frame(df_Z[!vec_na,])
+vec_X <- df$votes_gender[!vec_na]
+res_stdL2 <- rdtest::rdtest(
+  Z = df_Z_nonna,
+  vec_X = vec_X
+)
+ans <- summary(res_stdL2)
+res_max <- rdtest::rdtest(
+  Z = df_Z_nonna,
+  vec_X = vec_X,
+  bool_max_test = TRUE
+)
+ans <- summary(res_max)
+
+```
+
+
+
+```{r }
+df <- haven::read_dta("data_main.dta")
+df <- df[df$last_sales_year > 1996,]
+list_vars <- c("slope","aspect","nearwell","last_sales_year","value_pct_change_since_sales","area")
+df_Z <- df[,list_vars]
+
+vec_na <- rep(0,length(df_Z$slope))
+for (var in list_vars) {
+  y <- dplyr::pull(df_Z,var)
+  vec_na <- vec_na + is.na(y)
+  summary(rdrobust::rdrobust(y = y,x = df$boundary_dist,all=TRUE,rho=1))
+}
+```
+
+```{r}
+df_Z_nonna <- data.frame(df_Z[!vec_na,])
+vec_X <- df$boundary_dist[!vec_na]
+res_stdL2 <- rdtest::rdtest(
+  Z = df_Z_nonna,
+  vec_X = vec_X
+)
+ans <- summary(res_stdL2)
+res_max <- rdtest::rdtest(
+  Z = df_Z_nonna,
+  vec_X = vec_X,
+  bool_max_test = TRUE
+)
+ans <- summary(res_max)
+
+```

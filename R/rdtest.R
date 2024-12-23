@@ -19,6 +19,7 @@
 #' @param bool_L2_std Boolean, use of standardized Wald test, default is TRUE.
 #' @param bool_max_test Boolean, use of max test, instead of Wald tests, default
 #'   is FALSE.
+#' @param bool_stepdown Boolean, add holm-type correction for detecting more non-nulls. Active only if bool_joint is FALSE
 #'
 #' @examples
 #' # Prepare a mock dataset
@@ -47,8 +48,13 @@ rdtest <- function(Z,
                    int_J = 3,
                    real_cutoff = 0,
                    bool_max_test = FALSE,
-                   bool_L2_std = TRUE)
+                   bool_L2_std = TRUE,
+                   bool_stepdown = FALSE)
 {
+  # if bool_joint is TRUE then deactivate bool_stepdown
+  if (bool_joint) {
+    bool_stepdown <- FALSE
+  }
 
   #! CHECK IF int.dimZ > 0
   if (length(Z) == 0) {stop("Z must not be empty")}
@@ -107,7 +113,8 @@ rdtest <- function(Z,
     int_J = int_J,
     bool_max_test = bool_max_test,
     bool_L2_std = bool_L2_std,
-    bool_joint = bool_joint)
+    bool_joint = bool_joint,
+    bool_stepdown = bool_stepdown)
   list_result$call <- match.call()
   list_result$bool_max_test <- bool_max_test
   list_result$bool_L2_std <- bool_L2_std
