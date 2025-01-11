@@ -22,6 +22,7 @@ return_result_joint <- function(df_data,
   int_num_simul_draw <- 3000
 
   # Zstat
+  # if bool_stepdown is on, then return identities of nulls rejected by the stepdown
   list_result_covariate <-
     compute_test_stat(df_data = df_data,
                     int_dim_Z = int_dim_Z,
@@ -89,6 +90,9 @@ return_result_joint <- function(df_data,
       bool_reject_joint_null <- (real_pvalue <= 0.05)
       real_critical_value_joint <- stats::quantile(vec_random_draw_stat,0.95)
       real_stat_joint <- real_stat_L2_std_joint
+
+      # sequential procedure to repeat the procedure by removing the max stat
+
     } else {
       real_critical_value_joint <- stats::qchisq(.95, df=int_dim_total)
       if (bool_joint) {
@@ -104,6 +108,8 @@ return_result_joint <- function(df_data,
         real_stat_joint <- list_result_covariate$real_stat
         real_pvalue <- 1-stats::pchisq(real_stat_joint,df=int_dim_total)
       }
+
+      # sequential procedure to repeat the procedure by removing the largest stat
     }
   } else {
     if (bool_joint) {

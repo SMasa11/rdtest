@@ -7,7 +7,8 @@ compute_test_stat <- function(df_data,
                             int_J = 3,
                             bool_max_test = FALSE,
                             bool_L2_std = FALSE,
-                            bool_joint = TRUE)
+                            bool_joint = TRUE,
+                            bool_stepdown)
 {
   # booleans which return TRUE if tests are rejected by covariates only
   bool_reject_naive_null <- FALSE
