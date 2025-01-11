@@ -55,6 +55,10 @@ rdtest <- function(Z,
   if (bool_joint) {
     bool_stepdown <- FALSE
   }
+  # stepdown is straightforward only for max test
+  if (bool_max_test == FALSE) {
+    bool_stepdown <- FALSE
+  }
 
   #! CHECK IF int.dimZ > 0
   if (length(Z) == 0) {stop("Z must not be empty")}

@@ -253,12 +253,17 @@ compute_test_stat <- function(df_data,
   # also, multiply hk^(1/2): we take vec_hL here,
   # but not that bandwidths are chosen to be the same for both sides.
 
+  int_largest_stat <- NULL
+  real_largest_stat <- NULL
+
   if (bool_max_test) {
     for (l in 1:int_dim_Z) {
       vec_tstat_Z[l] <-
         vec_tstat_Z[l] * vec_se_Z[l] * (vec_h_L[l]^(1/2))/sqrt(mat_cov[l,l])
     }
     real_stat <- max(vec_tstat_Z^2)
+    int_largest_stat <- which.max(vec_tstat_Z^2)
+    real_largest_stat <- max(vec_tstat_Z^2)
   } else {
     ## Why are we multiplying the bandwidth here?
     # because we are allowing for different bands by l,
@@ -292,6 +297,8 @@ compute_test_stat <- function(df_data,
     real_median_tstat_Z = real_median_tstat_Z,
     real_max_abs_tstat_Z = real_max_abs_tstat_Z,
     real_effective_N_mean_Z=real_effective_N_mean_Z,
-    vec_tstat_Z_raw = vec_tstat_Z_raw)
+    vec_tstat_Z_raw = vec_tstat_Z_raw,
+    int_largest_stat = int_largest_stat,
+    real_largest_stat = real_largest_stat)
   return(list_result_covariate_part)
 }

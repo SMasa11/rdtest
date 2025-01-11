@@ -154,7 +154,8 @@ return_result_joint <- function(df_data,
          vec_tstat_Z_raw = list_result_covariate$vec_tstat_Z_raw,
          real_pvalue = real_pvalue,
          real_stat_joint = real_stat_joint,
-         int_largest_var = int_largest_var)
+         int_largest_stat = list_result_covariate$int_largest_stat,
+         real_largest_stat = list_result_covariate$real_largest_stat)
   return(list_result_joint_test)
 }
 
