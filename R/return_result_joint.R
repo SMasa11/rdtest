@@ -8,31 +8,25 @@
 #'  default is false.
 #' @param bool_L2_std Boolean, for using standardized t stat for L2 test.
 #' @param bool_joint Boolean, for returning joint test, instead of balance only.
-#' @param bool_stepdown Boolean, add holm-type correction for detecting more non-nulls. Active only if bool_joint is FALSE
-
 
 return_result_joint <- function(df_data,
                                int_dim_Z,
                                int_J = 3,
                                bool_max_test = FALSE,
                                bool_L2_std = TRUE,
-                               bool_joint = TRUE,
-                               bool_stepdown = FALSE)
+                               bool_joint = TRUE)
 {
   int_num_simul_draw <- 3000
 
   # Zstat
-  # if bool_stepdown is on, then return identities of nulls rejected by the stepdown
   list_result_covariate <-
     compute_test_stat(df_data = df_data,
                     int_dim_Z = int_dim_Z,
                     bool_joint = bool_joint,
                     int_J = int_J,
                     bool_L2_std = bool_L2_std,
-                    bool_max_test = bool_max_test,
-                    bool_stepdown = bool_stepdown)
+                    bool_max_test = bool_max_test)
 
-  # need to work on how to handle return when bool_stepdown is on
 
   bool_reject_naive_null <-
     list_result_covariate$bool_reject_naive_null
@@ -91,8 +85,6 @@ return_result_joint <- function(df_data,
       real_critical_value_joint <- stats::quantile(vec_random_draw_stat,0.95)
       real_stat_joint <- real_stat_L2_std_joint
 
-      # sequential procedure to repeat the procedure by removing the max stat
-
     } else {
       real_critical_value_joint <- stats::qchisq(.95, df=int_dim_total)
       if (bool_joint) {
@@ -109,7 +101,6 @@ return_result_joint <- function(df_data,
         real_pvalue <- 1-stats::pchisq(real_stat_joint,df=int_dim_total)
       }
 
-      # sequential procedure to repeat the procedure by removing the largest stat
     }
   } else {
     if (bool_joint) {
@@ -162,7 +153,8 @@ return_result_joint <- function(df_data,
          real_critical_value_joint = real_critical_value_joint,
          vec_tstat_Z_raw = list_result_covariate$vec_tstat_Z_raw,
          real_pvalue = real_pvalue,
-         real_stat_joint = real_stat_joint)
+         real_stat_joint = real_stat_joint,
+         int_largest_var = int_largest_var)
   return(list_result_joint_test)
 }
 

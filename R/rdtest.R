@@ -107,14 +107,27 @@ rdtest <- function(Z,
     df_data <- data.frame(vec_Z = Z,vec_X = vec_X)
   }
 
-  list_result <- return_result_joint(
-    df_data = df_data,
-    int_dim_Z = int_dim_Z,
-    int_J = int_J,
-    bool_max_test = bool_max_test,
-    bool_L2_std = bool_L2_std,
-    bool_joint = bool_joint,
-    bool_stepdown = bool_stepdown)
+  if (bool_stepdown) {
+    list_result <- return_result_joint(
+      df_data = df_data,
+      int_dim_Z = int_dim_Z,
+      int_J = int_J,
+      bool_max_test = bool_max_test,
+      bool_L2_std = bool_L2_std,
+      bool_joint = bool_joint)
+    # check the largest stats and remove
+
+    # redo until rejecting something
+
+  } else {
+    list_result <- return_result_joint(
+      df_data = df_data,
+      int_dim_Z = int_dim_Z,
+      int_J = int_J,
+      bool_max_test = bool_max_test,
+      bool_L2_std = bool_L2_std,
+      bool_joint = bool_joint)
+  }
   list_result$call <- match.call()
   list_result$bool_max_test <- bool_max_test
   list_result$bool_L2_std <- bool_L2_std
