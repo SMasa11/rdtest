@@ -8,15 +8,21 @@
 #'  default is false.
 #' @param bool_L2_std Boolean, for using standardized t stat for L2 test.
 #' @param bool_joint Boolean, for returning joint test, instead of balance only.
+#' @param bool_equivalence Boolean, for returning equivalence test.
+#' @param real_epsilon Numeric value, for equivalence test. Default NULL.
 
 return_result_joint <- function(df_data,
                                int_dim_Z,
                                int_J = 3,
                                bool_max_test = FALSE,
                                bool_L2_std = TRUE,
-                               bool_joint = TRUE)
+                               bool_joint = TRUE,
+                               bool_equivalence = FALSE,
+                               real_epsilon = NULL)
 {
   int_num_simul_draw <- 3000
+
+  bool_equivalence_reject <- NULL
 
   # Zstat
   list_result_covariate <-
@@ -25,7 +31,9 @@ return_result_joint <- function(df_data,
                     bool_joint = bool_joint,
                     int_J = int_J,
                     bool_L2_std = bool_L2_std,
-                    bool_max_test = bool_max_test)
+                    bool_max_test = bool_max_test,
+                    bool_equivalence = bool_equivalence,
+                    real_epsilon = real_epsilon)
 
   bool_reject_naive_null <-
     list_result_covariate$bool_reject_naive_null
@@ -103,6 +111,32 @@ return_result_joint <- function(df_data,
     if (bool_joint) {
       real_stat_max_joint <-
         max(list_result_covariate$real_stat,real_tstat_X^2)
+      if (bool_equivalence & !is.null(real_epsilon)) {
+        real_band_f <- sqrt((unlist(list_result_X$h["left"]) + unlist(list_result_X$h["right"]))/2)
+        real_V_f <- unlist(list_result_X$sd_jk["diff"])^2
+        real_hat_f <- unlist(list_result_X$hat["diff"])
+        real_tau_f_minus <- (real_hat_f - real_epsilon) * real_band_f / real_V_f
+        real_tau_f_plus <-(real_hat_f + real_epsilon) * real_band_f / real_V_f
+        # compute the sample size
+        int_sample_size <- length(df_data$vec_X)
+        max_equivalence_statistic <- 
+          sqrt(int_sample_size) * max(
+            list_result_covariate$max_equivalence_statistic,
+            real_tau_f_minus
+          )
+        min_equivalence_statistic <- 
+          sqrt(int_sample_size) * min(
+            list_result_covariate$min_equivalence_statistic,
+            real_tau_f_plus
+          )
+        bool_equivalence_reject <- (
+          max_equivalence_statistic <= qnorm(0.05/2) |
+          min_equivalence_statistic >= qnorm(1-0.05/2)
+        )
+        #print("-------")
+        #cat(max_equivalence_statistic,qnorm(0.05/2),min_equivalence_statistic,qnorm(1-0.05/2),"\n")
+        #print("-------")
+      }
     } else {
       real_stat_max_joint <- max(list_result_covariate$real_stat)
     }
@@ -150,7 +184,8 @@ return_result_joint <- function(df_data,
          real_critical_value_joint = real_critical_value_joint,
          vec_tstat_Z_raw = list_result_covariate$vec_tstat_Z_raw,
          real_pvalue = real_pvalue,
-         real_stat_joint = real_stat_joint)
+         real_stat_joint = real_stat_joint,
+         bool_equivalence_reject = bool_equivalence_reject)
   return(list_result_joint_test)
 }
 

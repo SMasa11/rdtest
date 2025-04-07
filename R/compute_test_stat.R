@@ -7,12 +7,26 @@ compute_test_stat <- function(df_data,
                             int_J = 3,
                             bool_max_test = FALSE,
                             bool_L2_std = FALSE,
-                            bool_joint = TRUE)
+                            bool_joint = TRUE,
+                            bool_equivalence = FALSE,
+                            real_epsilon = NULL)
 {
   # booleans which return TRUE if tests are rejected by covariates only
   bool_reject_naive_null <- FALSE
   bool_reject_bonferroni_null <- FALSE
 
+  # equivalence test is valid only for the max test form
+  if (bool_max_test == FALSE) {
+    bool_equivalence = FALSE
+  }
+  if (bool_equivalence & !is.null(real_epsilon)) {
+    max_equivalence_statistic <- -Inf
+    min_equivalence_statistic <- Inf
+  } else {
+    max_equivalence_statistic <- NA
+    min_equivalence_statistic <- NA
+  }
+ 
   real_effective_N_mean_Z <- 0
 
   vec_h_L <- rep(0,int_dim_Z)
@@ -257,6 +271,16 @@ compute_test_stat <- function(df_data,
     for (l in 1:int_dim_Z) {
       vec_tstat_Z[l] <-
         vec_tstat_Z[l] * vec_se_Z[l] * (vec_h_L[l]^(1/2))/sqrt(mat_cov[l,l])
+      if (bool_equivalence & !is.null(real_epsilon)) {
+        real_tau_minus <- 
+          (vec_tstat_Z[l]*vec_se_Z[l] - real_epsilon) * (vec_h_L[l]^(1/2))/sqrt(mat_cov[l,l])
+        real_tau_plus <-
+          (vec_tstat_Z[l]*vec_se_Z[l] + real_epsilon) * (vec_h_L[l]^(1/2))/sqrt(mat_cov[l,l])
+        max_equivalence_statistic <-
+          max(max_equivalence_statistic,real_tau_minus)
+        min_equivalence_statistic <-
+          min(min_equivalence_statistic,real_tau_plus)
+      }
     }
     real_stat <- max(vec_tstat_Z^2)
   } else {
@@ -292,6 +316,8 @@ compute_test_stat <- function(df_data,
     real_median_tstat_Z = real_median_tstat_Z,
     real_max_abs_tstat_Z = real_max_abs_tstat_Z,
     real_effective_N_mean_Z=real_effective_N_mean_Z,
-    vec_tstat_Z_raw = vec_tstat_Z_raw)
+    vec_tstat_Z_raw = vec_tstat_Z_raw,
+    max_equivalence_statistic = max_equivalence_statistic,
+    min_equivalence_statistic = min_equivalence_statistic)
   return(list_result_covariate_part)
 }

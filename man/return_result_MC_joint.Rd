@@ -16,7 +16,9 @@ return_result_MC_joint(
   bool_mutePrint = FALSE,
   int_J = 3,
   bool_max_test = FALSE,
-  bool_L2_std = FALSE
+  bool_L2_std = FALSE,
+  bool_joint = TRUE,
+  bool_skip_rwolf = FALSE
 )
 }
 \arguments{
@@ -47,6 +49,8 @@ default is 3.}
 default is false.}
 
 \item{bool_L2_std}{Boolean, for using standardized t stat for L2 test.}
+
+\item{bool_joint}{Boolean, for running joint test with density or not.}
 }
 \description{
 Example code for simulation excercise

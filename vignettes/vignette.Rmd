@@ -46,10 +46,10 @@ resolution to this multiple testing problem.
 
 You can install the development version of rdtest from [GitHub](https://github.com/) with:
 
-``` r
-# install.packages("devtools")
-devtools::install_github("SMasa11/rdtest")
-```
+%``` r
+%# install.packages("devtools")
+%devtools::install_github("SMasa11/rdtest")
+%```
 
 ## Usages
 
@@ -73,17 +73,21 @@ res_rd <- rdtest::rdtest(Z = Z, vec_X = vec_X)
 ans <- summary(res_rd)
 ```
 
-With `bool_max_test` option TRUE, `rdtest` returns max test result instead of `sWald` test result.
-```{r other statistics}
-res_rd <- rdtest::rdtest(Z = Z, vec_X = vec_X, bool_max_test = TRUE)
-ans <- summary(res_rd)
-```
-
 By toggling `bool_L2_std` option FALSE, `rdtest` returns non-standardized Wald test result, but in simulation, the non-standardized test does not control its size appropriately.
 ```{r Not recommended}
 res_rd <- rdtest::rdtest(Z = Z, vec_X = vec_X, bool_L2_std = FALSE)
 ans <- summary(res_rd)
 ```
+
+
+With `bool_max_test` option TRUE, `rdtest` returns max test result instead of `sWald` test result.
+```{r other statistics}
+res_rd <- rdtest::rdtest(Z = Z, vec_X = vec_X, bool_max_test = TRUE, bool_equivalence = TRUE)
+ans <- summary(res_rd)
+```
+When `bool_max_test` is TRUE, `bool_equivalence` option is available.
+If `bool_equivalence` is TRUE, the equivalence test result will also be returned.
+It returns the maximum (in absolute value) $\epsilon$ value for which we can reject the null hypothesis of the max of test stastitics being larger than $\epsilon$ in absolute value against the alternative of the test statistic being smaller than $\epsilon$ in absolute value.
 
 ## Use cases:
 ### Clark and Royer (2013, AER)
@@ -100,17 +104,18 @@ differences in the number of births and stillborn children.
 We confirm that their results are robust as the joint null hypothesis of no 
 difference whatsoever for the 1947 policy change cohorts
 ```{r 1947 change}
-df_018 <- haven::read_stata("018_births.dta")
+data_path <- system.file("extdata", "018_births.dta", package = "rdtest")
+df_018 <- haven::read_stata(data_path)
 df_018_1 <- data.frame(df_018[df_018$r == 1,c("births","still","s1mob1")])
 res_rd <- rdtest::rdtest(Z=df_018_1[,c("births","still")],vec_X = df_018_1$s1mob1)
 ans <- summary(res_rd)
 
-res_rd <- rdtest::rdtest(Z=df_018_1[,c("births","still")],vec_X = df_018_1$s1mob1,bool_max_test = TRUE)
+res_rd <- rdtest::rdtest(Z=df_018_1[,c("births","still")],vec_X = df_018_1$s1mob1,bool_max_test = TRUE,bool_equivalence = TRUE)
 ans <- summary(res_rd)
 ```
 as well as the 1972 policy change cohorts.
 ```{r 1972 change}
-df_018 <- haven::read_stata("018_births.dta")
+df_018 <- haven::read_stata(data_path)
 df_018_2 <- data.frame(df_018[df_018$r == 2,c("births","still","s2mob1")])
 vec_nan <- is.nan(df_018_2[,1]) + is.na(df_018_2[,1])
 vec_nan <- vec_nan + is.nan(df_018_2[,2]) + is.na(df_018_2[,2])
@@ -120,9 +125,10 @@ df_018_2 <- df_018_2[vec_nan == 0,]
 res_rd <- rdtest::rdtest(Z=df_018_2[,c("births","still")],vec_X = df_018_2$s2mob1)
 ans <- summary(res_rd)
 
-res_rd <- rdtest::rdtest(Z=df_018_2[,c("births","still")],vec_X = df_018_2$s2mob1,bool_max_test = TRUE)
+res_rd <- rdtest::rdtest(Z=df_018_2[,c("births","still")],vec_X = df_018_2$s2mob1,bool_max_test = TRUE,bool_equivalence = TRUE)
 ans <- summary(res_rd)
 ```
+Note that the equivalence test shows the null hypothesis that the max of test statistics is larger than an almost zero $\epsilon$ in absolute value can be rejected. This result comes from the fact that the density test passes with the perfect balance of zero t-statistics.
 
 ### Pons and Tricaud (2018, Ecta)
 Pons and Tricaud (2018) study the impact of qualifying the third candidate for
@@ -147,7 +153,8 @@ differences in any of the covariate means and density whatsoever. We confirm
 that the joint null hypothesis is not rejected, supporting the validity of the 
 original analysis further.
 ```{r}
-df_165 <- haven::read_stata("165_analysis.dta")
+data_path <- system.file("extdata", "165_analysis.dta", package = "rdtest")
+df_165 <- haven::read_stata(data_path)
 list_var <- c("nb_registered_R1",
               "nb_candidates_R1",
               "prop_registered_turnout_R1",
@@ -164,7 +171,7 @@ df_165 <- df_165[vec_nan == 0,]
 res_rd <- rdtest::rdtest(Z=df_165[,list_var],vec_X = df_165$running)
 ans <- summary(res_rd)
 
-res_rd <- rdtest::rdtest(Z=df_165[,list_var],vec_X = df_165$running,bool_max_test = TRUE)
+res_rd <- rdtest::rdtest(Z=df_165[,list_var],vec_X = df_165$running,bool_max_test = TRUE,bool_equivalence = TRUE)
 ans <- summary(res_rd)
 ```
 
