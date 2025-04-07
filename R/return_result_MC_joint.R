@@ -18,6 +18,7 @@
 #' @param bool_max_test Boolean, use max test instead of L2 test,
 #'  default is false.
 #' @param bool_L2_std Boolean, for using standardized t stat for L2 test.
+#' @param bool_joint Boolean, for running joint test with density or not.
 #'
 #' @export
 
@@ -32,7 +33,9 @@ return_result_MC_joint <- function(int_ns = 300,
                                      bool_mutePrint = FALSE,
                                      int_J = 3,
                                      bool_max_test = FALSE,
-                                     bool_L2_std = FALSE)
+                                     bool_L2_std = FALSE,
+                                     bool_joint = TRUE,
+                                     bool_skip_rwolf = FALSE)
 {
   set.seed(52622)
 
@@ -47,6 +50,11 @@ return_result_MC_joint <- function(int_ns = 300,
   # }
 
   ns <- int_ns
+  if (bool_joint == FALSE & bool_skip_rwolf == FALSE) {
+    rwolf.num.reject <- 0
+  } else {
+    rwolf.num.reject <- NA
+  }
   naive.num.reject <- 0
   bonfe.num.reject <- 0
   joint.num.reject <- 0
@@ -79,12 +87,15 @@ return_result_MC_joint <- function(int_ns = 300,
 
   for (loop in 1:ns)
   {
+    if (bool_mutePrint == FALSE) {
+      message("loop: ", loop)
+    }
     data <- simulate_DGP(option)
 
     if (option$int_dim_Z == 1) {
       list_result_joint <- rdtest(Z = data.frame(vec_Z.1=data$vec_Z.1),
                                   vec_X = data$vec_X,
-                                  bool_joint = TRUE,
+                                  bool_joint = bool_joint,
                                   int_J = int_J,
                                   real_cutoff = 0,
                                   bool_max_test = bool_max_test,
@@ -92,11 +103,66 @@ return_result_MC_joint <- function(int_ns = 300,
     } else {
       list_result_joint <- rdtest(Z = data[,1:option$int_dim_Z],
                                   vec_X = data[,option$int_dim_Z+1],
-                                  bool_joint = TRUE,
+                                  bool_joint = bool_joint,
                                   int_J = int_J,
                                   real_cutoff = 0,
                                   bool_max_test = bool_max_test,
                                   bool_L2_std = bool_L2_std)
+    }
+
+    if (bool_joint == FALSE) {
+      if (bool_skip_rwolf == FALSE) {
+        # run rwolf2 through stata to get the data.frame of p-values
+        if (option$int_dim_Z == 3) {
+          df_pvalues <- 
+            RStata::stata(
+              "caller_rwolf2_3.do",
+              data.in=data.frame(
+                z1 = data[,1],
+                z2 = data[,2],
+                z3 = data[,3],
+                x = data[,4]
+              ),
+              data.out=TRUE
+            )
+            min_pval <- min(
+              c(df_pvalues$rw_pval_1,
+                df_pvalues$rw_pval_2,
+                df_pvalues$rw_pval_3)
+            )
+        } else {
+          if (option$int_dim_Z == 5) {
+            df_pvalues <- 
+              RStata::stata(
+                "caller_rwolf2_5.do",
+                data.in=data.frame(
+                  z1 = data[,1],
+                  z2 = data[,2],
+                  z3 = data[,3],
+                  z4 = data[,4],
+                  z5 = data[,5],
+                  x = data[,6]
+                ),
+                data.out=TRUE
+              )
+            min_pval <- min(
+              c(df_pvalues$rw_pval_1,
+                df_pvalues$rw_pval_2,
+                df_pvalues$rw_pval_3,
+                df_pvalues$rw_pval_4,
+                df_pvalues$rw_pval_5)
+            )
+          } else {
+            stop("Only dim = 3 or 5 is supported for the current set-up using rwolf2")
+          }
+        }
+        print(min_pval)
+        print((min_pval < 0.05))
+        rwolf.num.reject <- 
+          rwolf.num.reject + (min_pval < 0.05)
+      } else {
+        rwolf.num.reject <- NA
+      }
     }
 
     naive.num.reject <-
@@ -105,6 +171,13 @@ return_result_MC_joint <- function(int_ns = 300,
       bonfe.num.reject + list_result_joint$bool_reject_bonferroni_null
     joint.num.reject <-
       joint.num.reject + list_result_joint$bool_reject_joint_null
+
+    if (bool_mutePrint == FALSE) {
+      message("naive: ", naive.num.reject/loop)
+      message("bonfe: ", bonfe.num.reject/loop)
+      message("joint: ", joint.num.reject/loop)
+      message("rwolf: ", rwolf.num.reject/loop)
+    }
 
     if (bool_max_test == FALSE) {
       chi.stat.vec[loop] <- list_result_joint$real_stat
@@ -164,6 +237,7 @@ return_result_MC_joint <- function(int_ns = 300,
                   naive = naive.num.reject/ns,
                   bonfe = bonfe.num.reject/ns,
                   joint = joint.num.reject/ns,
+                  rwolf = rwolf.num.reject/ns,
                   maxCritical = vec.criticalValue)
   return(summary)
 }

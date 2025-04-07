@@ -11,7 +11,9 @@ rdtest(
   int_J = 3,
   real_cutoff = 0,
   bool_max_test = FALSE,
-  bool_L2_std = TRUE
+  bool_L2_std = TRUE,
+  bool_equivalence = FALSE,
+  real_epsilon = NULL
 )
 }
 \arguments{
@@ -31,6 +33,10 @@ estimation, default is 3.}
 is FALSE.}
 
 \item{bool_L2_std}{Boolean, use of standardized Wald test, default is TRUE.}
+
+\item{bool_equivalence}{Boolean, for returning equivalence test.}
+
+\item{real_epsilon}{Numeric value, for equivalence test. Default NULL.}
 }
 \description{
 The rdtest package offers a joint test of commonly used diagnostic tests for

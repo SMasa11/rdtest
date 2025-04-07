@@ -19,6 +19,8 @@
 #' @param bool_L2_std Boolean, use of standardized Wald test, default is TRUE.
 #' @param bool_max_test Boolean, use of max test, instead of Wald tests, default
 #'   is FALSE.
+#' @param bool_equivalence Boolean, for returning equivalence test.
+#' @param real_epsilon Numeric value, for equivalence test. Default NULL.
 #'
 #' @examples
 #' # Prepare a mock dataset
@@ -47,7 +49,9 @@ rdtest <- function(Z,
                    int_J = 3,
                    real_cutoff = 0,
                    bool_max_test = FALSE,
-                   bool_L2_std = TRUE)
+                   bool_L2_std = TRUE,
+                   bool_equivalence = FALSE,
+                   real_epsilon = NULL)
 {
 
   #! CHECK IF int.dimZ > 0
@@ -101,19 +105,68 @@ rdtest <- function(Z,
     df_data <- data.frame(vec_Z = Z,vec_X = vec_X)
   }
 
+  if (bool_equivalence == TRUE) {
+    # constructing the equivalence CI
+    # increase real_eps_candid from 1 by multiplying 2 until list_result_CI$bool_equivalence_reject == TRUE
+    real_eps_candid <- 1
+    while (TRUE) {
+      list_result_CI <- return_result_joint(
+        df_data = df_data,
+        int_dim_Z = int_dim_Z,
+        int_J = int_J,
+        bool_max_test = bool_max_test,
+        bool_L2_std = bool_L2_std,
+        bool_joint = bool_joint,
+        bool_equivalence = bool_equivalence,
+        real_epsilon = real_eps_candid)
+      if (list_result_CI$bool_equivalence_reject == TRUE) {
+        break
+      }
+      real_eps_candid <- real_eps_candid * 2
+    }
+    # use binary search to find the smallest epsilon that rejects the null
+    real_eps_upper <- real_eps_candid
+    real_eps_lower <- 0
+    while (real_eps_upper - real_eps_lower > 1e-6) {
+      real_eps_candid <- (real_eps_upper + real_eps_lower) / 2
+      list_result_CI <- return_result_joint(
+        df_data = df_data,
+        int_dim_Z = int_dim_Z,
+        int_J = int_J,
+        bool_max_test = bool_max_test,
+        bool_L2_std = bool_L2_std,
+        bool_joint = bool_joint,
+        bool_equivalence = bool_equivalence,
+        real_epsilon = real_eps_candid)
+      if (list_result_CI$bool_equivalence_reject == TRUE) {
+        real_eps_upper <- real_eps_candid
+      } else {
+        real_eps_lower <- real_eps_candid
+      }
+    }
+    real_eps_CI <- c(-real_eps_upper, real_eps_upper)
+  } else {
+    real_eps_CI <- NA
+  }
+
   list_result <- return_result_joint(
     df_data = df_data,
     int_dim_Z = int_dim_Z,
     int_J = int_J,
     bool_max_test = bool_max_test,
     bool_L2_std = bool_L2_std,
-    bool_joint = bool_joint)
+    bool_joint = bool_joint,
+    bool_equivalence = bool_equivalence,
+    real_epsilon = real_epsilon)
   list_result$call <- match.call()
   list_result$bool_max_test <- bool_max_test
   list_result$bool_L2_std <- bool_L2_std
   list_result$bool_joint <- bool_joint
   list_result$vec_col_name_Z <- vec_col_name_Z
   list_result$int_dim_Z <- int_dim_Z
+  list_result$bool_equivalence <- bool_equivalence
+  list_result$real_epsilon <- real_epsilon
+  list_result$real_eps_CI <- real_eps_CI
 
   class(list_result) <- "rdtest"
 
@@ -193,6 +246,19 @@ summary.rdtest <- function (object, ...)
             `Joint p-alue` = round(ans$real_pvalue,3)
           ))
   print(knitr::kable(ans$joint_result,"rst"))
+
+  if (ans$bool_equivalence) {
+    if (is.null(ans$real_epsilon) == FALSE) {
+      print(paste0("Equivalence test at epsilon = " ,ans$real_epsilon,": rejection = ",ans$bool_equivalence_reject))
+    }
+    print(paste0(
+      "Equivalence test can reject the null hypothesis of min(stat) <= ",
+      round(ans$real_eps_CI[1],3),
+      " or max(stat) >= ",
+      round(ans$real_eps_CI[2],3),
+      " at the 5% level.")
+    )
+  }
 
   return(ans)
 }

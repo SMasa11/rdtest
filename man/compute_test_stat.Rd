@@ -10,7 +10,9 @@ compute_test_stat(
   int_J = 3,
   bool_max_test = FALSE,
   bool_L2_std = FALSE,
-  bool_joint = TRUE
+  bool_joint = TRUE,
+  bool_equivalence = FALSE,
+  real_epsilon = NULL
 )
 }
 \arguments{
@@ -27,6 +29,10 @@ default is false.}
 \item{bool_L2_std}{Boolean, for using standardized t stat for L2 test.}
 
 \item{bool_joint}{Boolean, for returning joint test, instead of balance only.}
+
+\item{bool_equivalence}{Boolean, for returning equivalence test.}
+
+\item{real_epsilon}{Numeric value, for equivalence test. Default NULL.}
 }
 \description{
 Return statistics for covariates balance or placebo test.
