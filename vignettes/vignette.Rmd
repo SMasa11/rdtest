@@ -45,11 +45,8 @@ resolution to this multiple testing problem.
 ## Installation
 
 You can install the development version of rdtest from [GitHub](https://github.com/) with:
-
-%``` r
-%# install.packages("devtools")
-%devtools::install_github("SMasa11/rdtest")
-%```
+install.packages("devtools")
+devtools::install_github("SMasa11/rdtest")
 
 ## Usages
 

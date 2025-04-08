@@ -29,7 +29,8 @@ Suggests:
     rmarkdown (>= 2.14),
     testthat (>= 3.0.0),
     tictoc (>= 1.0.1),
-    truncnorm (>= 1.0.8)
+    truncnorm (>= 1.0.8),
+    RStata (>= 1.1.1)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Imports: 

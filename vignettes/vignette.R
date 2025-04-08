@@ -1,4 +1,4 @@
-## ---- include = FALSE---------------------------------------------------------
+## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -20,25 +20,26 @@ vec_X <- rnorm(N)
 res_rd <- rdtest::rdtest(Z = Z, vec_X = vec_X)
 ans <- summary(res_rd)
 
-## ----other statistics---------------------------------------------------------
-res_rd <- rdtest::rdtest(Z = Z, vec_X = vec_X, bool_max_test = TRUE)
-ans <- summary(res_rd)
-
 ## ----Not recommended----------------------------------------------------------
 res_rd <- rdtest::rdtest(Z = Z, vec_X = vec_X, bool_L2_std = FALSE)
 ans <- summary(res_rd)
 
+## ----other statistics---------------------------------------------------------
+res_rd <- rdtest::rdtest(Z = Z, vec_X = vec_X, bool_max_test = TRUE, bool_equivalence = TRUE)
+ans <- summary(res_rd)
+
 ## ----1947 change--------------------------------------------------------------
-df_018 <- haven::read_stata("018_births.dta")
+data_path <- system.file("extdata", "018_births.dta", package = "rdtest")
+df_018 <- haven::read_stata(data_path)
 df_018_1 <- data.frame(df_018[df_018$r == 1,c("births","still","s1mob1")])
 res_rd <- rdtest::rdtest(Z=df_018_1[,c("births","still")],vec_X = df_018_1$s1mob1)
 ans <- summary(res_rd)
 
-res_rd <- rdtest::rdtest(Z=df_018_1[,c("births","still")],vec_X = df_018_1$s1mob1,bool_max_test = TRUE)
+res_rd <- rdtest::rdtest(Z=df_018_1[,c("births","still")],vec_X = df_018_1$s1mob1,bool_max_test = TRUE,bool_equivalence = TRUE)
 ans <- summary(res_rd)
 
 ## ----1972 change--------------------------------------------------------------
-df_018 <- haven::read_stata("018_births.dta")
+df_018 <- haven::read_stata(data_path)
 df_018_2 <- data.frame(df_018[df_018$r == 2,c("births","still","s2mob1")])
 vec_nan <- is.nan(df_018_2[,1]) + is.na(df_018_2[,1])
 vec_nan <- vec_nan + is.nan(df_018_2[,2]) + is.na(df_018_2[,2])
@@ -48,11 +49,12 @@ df_018_2 <- df_018_2[vec_nan == 0,]
 res_rd <- rdtest::rdtest(Z=df_018_2[,c("births","still")],vec_X = df_018_2$s2mob1)
 ans <- summary(res_rd)
 
-res_rd <- rdtest::rdtest(Z=df_018_2[,c("births","still")],vec_X = df_018_2$s2mob1,bool_max_test = TRUE)
+res_rd <- rdtest::rdtest(Z=df_018_2[,c("births","still")],vec_X = df_018_2$s2mob1,bool_max_test = TRUE,bool_equivalence = TRUE)
 ans <- summary(res_rd)
 
 ## -----------------------------------------------------------------------------
-df_165 <- haven::read_stata("165_analysis.dta")
+data_path <- system.file("extdata", "165_analysis.dta", package = "rdtest")
+df_165 <- haven::read_stata(data_path)
 list_var <- c("nb_registered_R1",
               "nb_candidates_R1",
               "prop_registered_turnout_R1",
@@ -69,6 +71,6 @@ df_165 <- df_165[vec_nan == 0,]
 res_rd <- rdtest::rdtest(Z=df_165[,list_var],vec_X = df_165$running)
 ans <- summary(res_rd)
 
-res_rd <- rdtest::rdtest(Z=df_165[,list_var],vec_X = df_165$running,bool_max_test = TRUE)
+res_rd <- rdtest::rdtest(Z=df_165[,list_var],vec_X = df_165$running,bool_max_test = TRUE,bool_equivalence = TRUE)
 ans <- summary(res_rd)
 

@@ -19,6 +19,9 @@
 #'  default is false.
 #' @param bool_L2_std Boolean, for using standardized t stat for L2 test.
 #' @param bool_joint Boolean, for running joint test with density or not.
+#' @param bool_skip_rwolf Boolean, for skipping rwolf2 call,
+#'  which is time consuming and requires Stata to run. Default is FALSE,
+#'  but effective only when bool_joint is FALSE as well.
 #'
 #' @export
 
@@ -114,7 +117,7 @@ return_result_MC_joint <- function(int_ns = 300,
       if (bool_skip_rwolf == FALSE) {
         # run rwolf2 through stata to get the data.frame of p-values
         if (option$int_dim_Z == 3) {
-          df_pvalues <- 
+          df_pvalues <-
             RStata::stata(
               "caller_rwolf2_3.do",
               data.in=data.frame(
@@ -132,7 +135,7 @@ return_result_MC_joint <- function(int_ns = 300,
             )
         } else {
           if (option$int_dim_Z == 5) {
-            df_pvalues <- 
+            df_pvalues <-
               RStata::stata(
                 "caller_rwolf2_5.do",
                 data.in=data.frame(
@@ -158,7 +161,7 @@ return_result_MC_joint <- function(int_ns = 300,
         }
         print(min_pval)
         print((min_pval < 0.05))
-        rwolf.num.reject <- 
+        rwolf.num.reject <-
           rwolf.num.reject + (min_pval < 0.05)
       } else {
         rwolf.num.reject <- NA

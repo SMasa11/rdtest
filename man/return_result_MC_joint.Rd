@@ -51,6 +51,10 @@ default is false.}
 \item{bool_L2_std}{Boolean, for using standardized t stat for L2 test.}
 
 \item{bool_joint}{Boolean, for running joint test with density or not.}
+
+\item{bool_skip_rwolf}{Boolean, for skipping rwolf2 call,
+which is time consuming and requires Stata to run. Default is FALSE,
+but effective only when bool_joint is FALSE as well.}
 }
 \description{
 Example code for simulation excercise
