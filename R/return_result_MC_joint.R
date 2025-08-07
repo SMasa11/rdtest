@@ -42,16 +42,6 @@ return_result_MC_joint <- function(int_ns = 300,
 {
   set.seed(52622)
 
-  # if (jump != 0)
-  # {
-  #   if (frac_jump == 0)
-  #   {
-  #     warning(
-  #       "WARNING:
-  #       JUMP IS SPECIFIED BUT NOT APPLIED AS frac.jump IS NOT SPECIFIED.")
-  #   }
-  # }
-
   ns <- int_ns
   if (bool_joint == FALSE & bool_skip_rwolf == FALSE) {
     rwolf.num.reject <- 0
@@ -71,7 +61,6 @@ return_result_MC_joint <- function(int_ns = 300,
   max.jump.z.vec <- c(1:ns)
   vec.criticalValue <- c(1:ns)
 
-  #fun.mu <- function(x){return(x^2)}
   fun_mu <- function(x){
     return(
       0.48
@@ -88,8 +77,10 @@ return_result_MC_joint <- function(int_ns = 300,
                   str_frac_jump_Z = frac_jump,
                   fun_mu = fun_mu)
 
+  pb <- utils::txtProgressBar(min = 1, max = ns, style = 3, char = "=")
   for (loop in 1:ns)
   {
+    utils::setTxtProgressBar(pb, loop)
     if (bool_mutePrint == FALSE) {
       message("loop: ", loop)
     }

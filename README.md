@@ -13,9 +13,10 @@ restrictions of regression discontinuity (RD) designs. This package
 combines the existing packages of diagnostic testing (rddensity and
 rdrobust) to offer a set of joint test statistics to evaluate the
 validity of a given RD design. The theoretical background of this
-package is provided in [Fusejima, Ishihara, and Sawada (2023,
-arXiv)](https://arxiv.org/abs/2205.04345). This work is supported by
-JSPS KAKENHI Grant Number JP20J20046 (Fusejima), 22K13373 (Ishihara), and 21K13269 (Sawada).
+package is provided in [Fusejima, Ishihara, and Sawada (2025, Journal of
+Econometrics)](https://www.sciencedirect.com/science/article/pii/S0304407625001289).
+This work is supported by JSPS KAKENHI Grant Number JP20J20046,
+JP23K18799 (Fusejima); JP20J00900 (Ishihara); and 21K13269 (Sawada).
 
 ## Background
 
@@ -25,7 +26,7 @@ balancing of pre-treatment covariates. Violation of any of these
 testable restrictions raises a concern about the sufficient condition.
 (Nevertheless, these testable restrictions are not directly related to
 identification itself. See [Ishihara and Sawada
-(2023)](https://arxiv.org/abs/2009.07551) for further details.)
+(2024)](https://arxiv.org/abs/2009.07551) for further details.)
 
 Both testable restrictions are implemented in R packages, for example,
 [*rddensity*](https://rdpackages.github.io/rddensity/) ([Calonico,
@@ -35,17 +36,17 @@ former and [*rdrobust*](https://rdpackages.github.io/rdrobust/)
 ([Cattaneo, Jansson, and Ma
 (2020)](https://www.tandfonline.com/doi/abs/10.1080/01621459.2019.1635480))
 for the latter. As pointed out in [Fusejima, et
-al. (2023)](https://arxiv.org/abs/2205.04345), however, multiple tests
-(median number of tests is 12) are run in practice without appropriate
-size control for most of the studies. Consequently, these RD practices
-suffer from massive size distortion due to *multiple testing problem*.
-Among 60 papers studied, 35% of studies reject at least one of these
-testable restrictions; however, the rejection of each test separately is
-approximately 5%. Hence, the RD designs in these studies appear to
-maintain the null hypotheses; however, not a small fraction of studies
-contain false rejections of the null hypotheses more frequently than
-they should be. Our *rdtest* package is the resolution to this multiple
-testing problem.
+al. (2025)](https://www.sciencedirect.com/science/article/pii/S0304407625001289),
+however, multiple tests (median number of tests is 12) are run in
+practice without appropriate size control for most of the studies.
+Consequently, these RD practices suffer from massive size distortion due
+to *multiple testing problem*. Among 59 papers studied, one-third of
+studies reject at least one of these testable restrictions; however, the
+rejection of each test separately is approximately 5%. Hence, the RD
+designs in these studies appear to maintain the null hypotheses;
+however, not a small fraction of studies contain false rejections of the
+null hypotheses more frequently than they should be. Our *rdtest*
+package is the resolution to this multiple testing problem.
 
 ## Installation
 
